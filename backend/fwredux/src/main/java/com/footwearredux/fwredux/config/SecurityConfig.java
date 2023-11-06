@@ -15,7 +15,7 @@ public class SecurityConfig{
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authz) -> authz
-                        .anyRequest().rememberMe()
+                        .anyRequest().permitAll()
                 )
                 .httpBasic(withDefaults());
         return http.build();
