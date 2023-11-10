@@ -1,6 +1,6 @@
 package com.footwearredux.fwredux.model;
 
-public enum ClientRole {
+public enum UserRole {
     NORMAL,
     PREMIUM,
     ADMIN
