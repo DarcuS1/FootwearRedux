@@ -27,14 +27,17 @@ public class SecurityConfig{
                         .disable()
                 )
                 .authorizeHttpRequests( authorize -> authorize
-                        .anyRequest()
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/shoes/fetch", "/api/v1/shoe_images/fetch/**")
                         .permitAll()
+                        .anyRequest()
+                        .authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authentificationProvide)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+        ;
 
         return http.build();
     }
