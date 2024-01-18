@@ -1,14 +1,54 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const SignUpComponent = () => {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Submit logic goes here
-    console.log({ name, email, password });
+    console.log({ firstName, lastName, email, password });
+
+    const url = "http://localhost:8080/api/v1/auth/register";
+    const data = {
+      email: email,
+      password: password,
+      firstName: firstName,
+      lastName: lastName,
+    };
+
+
+    fetch(url, {
+      method: "POST", // HTTP method
+      headers: {
+        "Content-Type": "application/json", // Set the content type to JSON
+      },
+      body: JSON.stringify(data), // Convert data to JSON format
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json(); // Parse the response JSON
+      })
+      .then((responseData) => {
+        // Handle the response data here
+        console.log("Register response Data:", responseData);
+        if (responseData.error !== null) {
+          throw new Error(`Register error: ${responseData.error}`)
+        } else {
+          navigate('/sign-in')
+        }
+
+      })
+      .catch((error) => {
+        // Handle any errors that occurred during the fetch
+        console.error("Fetch Error:", error);
+      });
   };
 
   return (
@@ -59,13 +99,23 @@ const SignUpComponent = () => {
                 className="relative w-full mt-10 space-y-8"
               >
                 <div className="relative">
-                  <label className="font-medium text-gray-900">Name</label>
+                  <label className="font-medium text-gray-900">First Name</label>
                   <input
                     type="text"
                     className="block w-full px-4 py-4 mt-2 text-xl placeholder-gray-400 bg-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-600 focus:ring-opacity-50"
-                    placeholder="Enter Your Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Enter Your First Name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </div>
+                <div className="relative">
+                  <label className="font-medium text-gray-900">Last Name</label>
+                  <input
+                    type="text"
+                    className="block w-full px-4 py-4 mt-2 text-xl placeholder-gray-400 bg-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-600 focus:ring-opacity-50"
+                    placeholder="Enter Your Last Name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                   />
                 </div>
                 <div className="relative">
