@@ -1,28 +1,38 @@
 import React, { useState, useEffect } from "react";
 
-const Product = () => {
+const Product = ({ criteria }) => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    // Fetch products from your database
-    // This is a placeholder function, replace it with your actual data fetching logic
     const fetchProducts = async () => {
-      // Example: fetch('your-api-endpoint')
-      // Then set the products in state
-      setProducts([
-        {
-          id: 1,
-          name: "Product 1",
-          description: "Some description about the product.",
-          price: 99.99,
-          image: "https://generated.vusercontent.net/placeholder.svg",
-        },
-        // Add more products as needed
-      ]);
+      try {
+        const requestBody = {
+          pageIndex: 0,
+          criteria: criteria,
+        };
+        console.log(requestBody);
+
+        const response = await fetch("/api/v1/shoes/fetch", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch shoe products");
+        }
+
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching shoe products:", error);
+      }
     };
 
     fetchProducts();
-  }, []);
+  }, [criteria]);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-10">
