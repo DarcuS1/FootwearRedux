@@ -34,7 +34,8 @@ export default function Filter({ onFilterChange }) {
   // State for each select
   const [criteria, setCriteria] = useState({
     category: "",
-    priceRange: "",
+    priceMin: "",
+    priceMax: "",
     brand: "",
     color: "",
     shoeSize: "",
@@ -104,10 +105,37 @@ export default function Filter({ onFilterChange }) {
     }));
   };
 
+  const mapPriceRange = (selectedPriceRange) => {
+    let priceMin, priceMax;
+
+    switch (selectedPriceRange) {
+        case "under_50":
+            priceMin = 0;
+            priceMax = 50;
+            break;
+        case "50_to_100":
+            priceMin = 50;
+            priceMax = 100;
+            break;
+        case "above_100":
+            priceMin = 100;
+            priceMax = Infinity; // or a large number to represent 'above $100'
+            break;
+        default:
+            // Handle unexpected values
+            throw new Error("Invalid price range");
+    }
+
+    return { priceMin, priceMax };
+}
+
   const handlePriceRangeChange = (selectedPriceRange) => {
-    setCriteria((prevCriteria) => ({
+    const { priceMin, priceMax } = mapPriceRange(selectedPriceRange);
+    setCriteria((prevCriteria) => (
+      {
       ...prevCriteria,
-      priceRange: selectedPriceRange,
+      priceMin: priceMin,
+      priceMax: priceMax
     }));
   };
 

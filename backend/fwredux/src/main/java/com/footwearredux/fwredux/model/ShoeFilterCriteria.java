@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 public class ShoeFilterCriteria {
     private Integer id;
 
-    private ShoeCategory shoeCategory;
-
-    private Integer price;
+    private ShoeCategory category;
+    private Integer priceMin;
+    private Integer priceMax;
     private String brand;
     private String color;
     private Integer shoeSize;

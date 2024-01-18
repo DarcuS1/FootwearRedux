@@ -13,7 +13,7 @@ const Product = ({ criteria }) => {
         console.log(requestBody);
 
         const response = await fetch("/api/v1/shoes/fetch", {
-          method: "POST",
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
           },

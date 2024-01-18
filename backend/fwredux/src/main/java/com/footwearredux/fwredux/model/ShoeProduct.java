@@ -36,6 +36,7 @@ public class ShoeProduct {
     private String color;
     private Integer shoeSize;
     private String shoeStyle;
+    private String description;
 
     @Enumerated(value = EnumType.STRING)
     private GenderRole gender;

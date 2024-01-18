@@ -63,9 +63,21 @@ public class ShoeProductService {
                 .shoeStyle(Request.getShoeStyle())
                 .gender(Request.getGender())
                 .seller(user)
+                .description(Request.getDescription())
                 .build();
 
         return shoeProductRepository.save(shoe);
+    }
+
+    public void removeShoe(String userEmail, String uuid) {
+        ShoeProduct product = shoeProductRepository.findByUuid(uuid).orElseThrow(() -> throw new UsernameNotFoundException(userEmail));
+
+        if (!product.getSeller().getEmail().equals(userEmail)) {
+            throw new UsernameNotFoundException(userEmail);
+        }
+
+        shoeProductRepository.deleteByUuid(uuid);
+
     }
 
     @Transactional

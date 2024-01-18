@@ -61,4 +61,13 @@ public class ShoeProductController {
                 .shoeUUID(product.getUuid())
                 .build());
     }
+
+    @DeleteMapping("remove/{uuid}")
+    private ResponseEntity<Void> removeShoe(@PathVariable String uuid) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        shoeProductService.removeShoe(authentication.getName(), uuid);
+
+        return ResponseEntity.ok().build();
+    }
 }
