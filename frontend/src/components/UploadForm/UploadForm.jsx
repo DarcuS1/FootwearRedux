@@ -1,184 +1,230 @@
 import React, { useState } from "react";
 
-const UploadForm = () => {
-  const [productImage, setProductImage] = useState(null);
-  const [additionalImage1, setAdditionalImage1] = useState(null);
-  const [additionalImage2, setAdditionalImage2] = useState(null);
-  const [additionalImage3, setAdditionalImage3] = useState(null);
-  const [productName, setProductName] = useState("");
-  const [productDescription, setProductDescription] = useState("");
-  const [productPrice, setProductPrice] = useState("");
-  const [sellerName, setSellerName] = useState("");
-  const [sellerContact, setSellerContact] = useState("");
+// Define the Select component
+const Select = ({ placeholder, options, value, onChange }) => {
+  return (
+    <select
+      className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+      value={value}
+      onChange={onChange}
+    >
+      <option value="">{placeholder}</option>
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  );
+};
 
+const UploadForm = () => {
+  // State hooks for all input fields
+  const [shoeName, setShoeName] = useState("");
+  const [category, setCategory] = useState("");
+  const [price, setPrice] = useState("");
+  const [brand, setBrand] = useState("");
+  const [color, setColor] = useState("");
+  const [shoeSize, setShoeSize] = useState("");
+  const [shoeStyle, setShoeStyle] = useState("");
+  const [description, setDescription] = useState("");
+  const [gender, setGender] = useState("");
+
+  // State hooks for images
+  const [coverImage, setCoverImage] = useState(null);
+  const [secondImage, setSecondImage] = useState(null);
+  const [thirdImage, setThirdImage] = useState(null);
+  const [fourthImage, setFourthImage] = useState(null);
+
+  // Option arrays for Select components
+  const categories = [
+    { value: "sneakers", label: "Sneakers" },
+    { value: "boots", label: "Boots" },
+    { value: "sandals", label: "Sandals" },
+    { value: "dress", label: "Dress Shoes" },
+    // Add more categories as needed
+  ];
+
+  const brands = [
+    { value: "nike", label: "Nike" },
+    { value: "adidas", label: "Adidas" },
+    { value: "puma", label: "Puma" },
+    { value: "reebok", label: "Reebok" },
+    // Add more brands as needed
+  ];
+
+  const colors = [
+    { value: "black", label: "Black" },
+    { value: "white", label: "White" },
+    { value: "red", label: "Red" },
+    { value: "blue", label: "Blue" },
+    // Add more colors as needed
+  ];
+
+  const shoeSizes = [
+    { value: "us_6", label: "US 6" },
+    { value: "us_7", label: "US 7" },
+    { value: "us_8", label: "US 8" },
+    { value: "us_9", label: "US 9" },
+    // Add more shoe sizes as needed
+  ];
+
+  const shoeStyles = [
+    { value: "casual", label: "Casual" },
+    { value: "athletic", label: "Athletic" },
+    { value: "formal", label: "Formal" },
+    // Add more shoe styles as needed
+  ];
+
+  const genders = [
+    { value: "male", label: "Male" },
+    { value: "female", label: "Female" },
+    { value: "unisex", label: "Unisex" },
+    // Add more genders as needed
+  ];
+
+  // Image change handler
   const handleImageChange = (e, setImage) => {
     const file = e.target.files[0];
     const imageUrl = URL.createObjectURL(file);
     setImage(imageUrl);
   };
 
+  // Form submission handler
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = {
-      productName,
-      productDescription,
-      productPrice,
-      sellerName,
-      sellerContact,
-      productImage,
-      additionalImage1,
-      additionalImage2,
-      additionalImage3
+      shoeName,
+      category,
+      price,
+      brand,
+      color,
+      shoeSize,
+      shoeStyle,
+      description,
+      gender,
+      coverImage,
+      secondImage,
+      thirdImage,
+      fourthImage,
     };
     console.log("Form Data:", formData);
-
+    // Typically, you'd send formData to your server here
   };
 
   return (
-    <div className="container max-w-lg px-4 py-5 mx-auto mt-px md:max-w-none md:text-center">
-      <h2 className="text-3xl font-bold text-center mb-6">Upload Your Product</h2>
-      <div className="grid lg:grid-cols-3 gap-8 items-start">
-        <div className="flex flex-col space-y-4 justify-center items-center lg:order-last">
-          <img
-            src={productImage}
-            width="200"
-            height="200"
-            alt="Uploaded Product Image"
-            className="rounded-xl"
-            style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
+    <div className="container max-w-screen-lg mx-auto py-5 px-4 md:py-10 flex justify-center items-center">
+      <form onSubmit={handleSubmit} className="w-full md:w-1/2 space-y-4">
+        <h2 className="text-3xl font-bold text-center mb-6">
+          Upload Shoe Product
+        </h2>
+        <input
+          type="text"
+          placeholder="Shoe Name"
+          value={shoeName}
+          onChange={(e) => setShoeName(e.target.value)}
+          className="block w-full px-4 py-2 border border-gray-300 rounded-md"
+        />
+        <Select
+          placeholder="Select a category"
+          options={categories}
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Price"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          className="block w-full px-4 py-2 border border-gray-300 rounded-md"
+        />
+        <Select
+          placeholder="Select a brand"
+          options={brands}
+          value={brand}
+          onChange={(e) => setBrand(e.target.value)}
+        />
+        <Select
+          placeholder="Select a color"
+          options={colors}
+          value={color}
+          onChange={(e) => setColor(e.target.value)}
+        />
+        <Select
+          placeholder="Select a shoe size"
+          options={shoeSizes}
+          value={shoeSize}
+          onChange={(e) => setShoeSize(e.target.value)}
+        />
+        <Select
+          placeholder="Select a shoe style"
+          options={shoeStyles}
+          value={shoeStyle}
+          onChange={(e) => setShoeStyle(e.target.value)}
+        />
+        <textarea
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="block w-full px-4 py-2 border border-gray-300 rounded-md"
+        />
+        <Select
+          placeholder="Select gender"
+          options={genders}
+          value={gender}
+          onChange={(e) => setGender(e.target.value)}
+        />
+        <div className="flex space-x-2">
+          <input
+            type="file"
+            onChange={(e) => handleImageChange(e, setCoverImage)}
           />
-          <img
-            src={additionalImage1 || 'https://via.placeholder.com/200'}
-            width="200"
-            height="200"
-            alt="Additional Image 1"
-            className="rounded-xl"
-            style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
+          <input
+            type="file"
+            onChange={(e) => handleImageChange(e, setSecondImage)}
           />
-          <img
-            src={additionalImage2 || 'https://via.placeholder.com/200'}
-            width="200"
-            height="200"
-            alt="Additional Image 2"
-            className="rounded-xl"
-            style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
+          <input
+            type="file"
+            onChange={(e) => handleImageChange(e, setThirdImage)}
           />
-          <img
-            src={additionalImage3 || 'https://via.placeholder.com/200'}
-            width="200"
-            height="200"
-            alt="Additional Image 3"
-            className="rounded-xl"
-            style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
+          <input
+            type="file"
+            onChange={(e) => handleImageChange(e, setFourthImage)}
           />
         </div>
-        <div className="space-y-6 lg:col-span-2">
-          <form onSubmit={handleSubmit}>
-          <label
-                className="block text-lg font-medium mb-2"
-                htmlFor="product-name"
-              >
-                Product Name
-              </label>
-              <input
-                id="product-name"
-                className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                type="text"
-                value={productName}
-                onChange={(e) => setProductName(e.target.value)}
-              />
-
-              <label
-                className="block text-lg font-medium mt-4 mb-2"
-                htmlFor="product-description"
-              >
-                Product Description
-              </label>
-              <textarea
-                id="product-description"
-                rows="4"
-                className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={productDescription}
-                onChange={(e) => setProductDescription(e.target.value)}
-              ></textarea>
-
-              <label
-                className="block text-lg font-medium mt-4 mb-2"
-                htmlFor="product-price"
-              >
-                Product Price
-              </label>
-              <input
-                id="product-price"
-                className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                type="number"
-                value={productPrice}
-                onChange={(e) => setProductPrice(e.target.value)}
-              />
-
-              <label
-                className="block text-lg font-medium mt-4 mb-2"
-                htmlFor="product-image"
-              >
-                Product Image (This image will be displayed on the right)
-              </label>
-              <input
-                id="product-image"
-                className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                type="file"
-                onChange={(e) => handleImageChange(e, setProductImage)}
-              />
-            <input
-              type="file"
-              onChange={(e) => handleImageChange(e, setAdditionalImage1)}
-            />
-            <input
-              type="file"
-              onChange={(e) => handleImageChange(e, setAdditionalImage2)}
-            />
-            <input
-              type="file"
-              onChange={(e) => handleImageChange(e, setAdditionalImage3)}
-            />
-                         <div className="space-y-6 mt-6">
-                <div className="text-lg font-bold mb-4">Seller Information</div>
-                <label
-                  className="block text-lg font-medium mb-2"
-                  htmlFor="seller-name"
-                >
-                  Seller Name
-                </label>
-                <input
-                  id="seller-name"
-                  className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  type="text"
-                  value={sellerName}
-                  onChange={(e) => setSellerName(e.target.value)}
-                />
-
-                <label
-                  className="block text-lg font-medium mt-4 mb-2"
-                  htmlFor="seller-contact"
-                >
-                  Seller Contact
-                </label>
-                <input
-                  id="seller-contact"
-                  className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  type="text"
-                  value={sellerContact}
-                  onChange={(e) => setSellerContact(e.target.value)}
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full md:w-auto bg-blue-500 rounded border-black border-5 text-white mt-6"
-              >
-                Upload
-              </button>
-          </form>
-        </div>
+        <button
+          type="submit"
+          className="block w-full px-4 py-2 bg-blue-500 text-white rounded-md"
+        >
+          Upload
+        </button>
+      </form>
+      {/* Image preview cards */}
+      <div className="w-full md:w-1/2 md:ml-8 space-y-4">
+        {coverImage && (
+          <div className="max-w-xs rounded-md overflow-hidden">
+            <img src={coverImage} alt="Cover" className="w-full" />
+            <p className="text-center">Cover Image</p>
+          </div>
+        )}
+        {secondImage && (
+          <div className="max-w-xs rounded-md overflow-hidden">
+            <img src={secondImage} alt="Second" className="w-full" />
+            <p className="text-center">Second Image</p>
+          </div>
+        )}
+        {thirdImage && (
+          <div className="max-w-xs rounded-md overflow-hidden">
+            <img src={thirdImage} alt="Third" className="w-full" />
+            <p className="text-center">Third Image</p>
+          </div>
+        )}
+        {fourthImage && (
+          <div className="max-w-xs rounded-md overflow-hidden">
+            <img src={fourthImage} alt="Fourth" className="w-full" />
+            <p className="text-center">Fourth Image</p>
+          </div>
+        )}
       </div>
     </div>
   );
