@@ -1,16 +1,12 @@
 package com.footwearredux.fwredux.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Data
 @Builder
@@ -18,11 +14,16 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "_user")
+@ToString(exclude = {"sellingProducts", "cart", "sellerReviews"})
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue
     private Integer id;
+
+    @Column(updatable = false, unique = true, nullable = false)
+    private String uuid;
+
     private String firstName;
     private String lastname;
 
@@ -32,6 +33,15 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ShoeProduct> sellingProducts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Review> sellerReviews = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Cart cart;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -61,5 +71,19 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @PrePersist
+    public void initialize() {
+        if (uuid == null) {
+            uuid = UUID.randomUUID().toString();
+        }
+
+        if (cart == null) {
+            cart = Cart.builder()
+                    .user(this)
+                    .products(Collections.emptyList())
+                    .build();
+        }
     }
 }
