@@ -70,7 +70,7 @@ public class ShoeProductService {
     }
 
     public void removeShoe(String userEmail, String uuid) {
-        ShoeProduct product = shoeProductRepository.findByUuid(uuid).orElseThrow(() -> throw new UsernameNotFoundException(userEmail));
+        ShoeProduct product = shoeProductRepository.findByUuid(uuid).orElseThrow(() -> new UsernameNotFoundException(userEmail));
 
         if (!product.getSeller().getEmail().equals(userEmail)) {
             throw new UsernameNotFoundException(userEmail);
