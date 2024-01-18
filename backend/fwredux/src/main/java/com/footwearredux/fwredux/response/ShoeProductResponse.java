@@ -37,7 +37,11 @@ public class ShoeProductResponse {
         this.shoeSize = product.getShoeSize();
         this.shoeStyle = product.getShoeStyle();
         this.gender = product.getGender();
-        this.coverImageUuid = product.getImages().getCoverImage().getUuid();
+        try {
+            this.coverImageUuid = product.getImages().getCoverImage().getUuid();
+        } catch (Exception ex) {
+            this.coverImageUuid = "";
+        }
         this.sellerUUID = product.getSeller().getUuid();
     }
 }

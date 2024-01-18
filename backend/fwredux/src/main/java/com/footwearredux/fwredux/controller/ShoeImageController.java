@@ -20,6 +20,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/v1/shoe_images")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class ShoeImageController {
 
     private final ShoeImageService shoeImageService;
@@ -40,8 +41,8 @@ public class ShoeImageController {
 
     @PostMapping("set_cover/{uuid}")
     private ResponseEntity<ShoeImageUuidResponse> setCoverForShoe(
-            @NotNull @PathVariable String uuid,
-            @NotNull @RequestParam("file") MultipartFile file) {
+            @PathVariable String uuid,
+            @RequestParam("file") MultipartFile file) {
 
         // Check if the file is empty
         if (file.isEmpty()) {

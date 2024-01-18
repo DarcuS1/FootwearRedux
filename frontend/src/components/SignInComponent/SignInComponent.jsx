@@ -1,12 +1,51 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const SignInComponent = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const navigate = useNavigate()
+
   const handleLogin = (e) => {
     e.preventDefault();
     console.log("Logging in with:", { email, password });
+
+    const url = 'http://localhost:8080/api/v1/auth/authenticate';
+    const data = {
+      email: email,
+      password: password
+    }
+
+    fetch(url, {
+      method: "POST", // HTTP method
+      headers: {
+        "Content-Type": "application/json", // Set the content type to JSON
+      },
+      body: JSON.stringify(data), // Convert data to JSON format
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json(); // Parse the response JSON
+      })
+      .then((responseData) => {
+        // Handle the response data here
+        console.log("Authentication response data:", responseData);
+        if (responseData.error !== null) {
+          throw new Error(`Authentication error: ${responseData.error}`)
+        } else {
+          localStorage.setItem("jwtToken", responseData.token)
+          navigate('/home')
+        }
+
+      })
+      .catch((error) => {
+        // Handle any errors that occurred during the fetch
+        console.error("Fetch Error:", error);
+      });
+
   };
 
   return (
