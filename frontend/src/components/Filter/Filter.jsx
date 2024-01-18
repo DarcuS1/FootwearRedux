@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 // Define Select component
+// Define Select component
 const Select = ({ placeholder, options, value, onChange }) => {
   return (
     <select
@@ -29,72 +30,126 @@ const Button = ({ children, variant, ...props }) => {
   );
 };
 
-export default function Filter() {
+export default function Filter({ onFilterChange }) {
   // State for each select
-  const [category, setCategory] = useState("");
-  const [priceRange, setPriceRange] = useState("");
-  const [brand, setBrand] = useState("");
-  const [color, setColor] = useState("");
-  const [shoeSize, setShoeSize] = useState("");
-  const [shoeStyle, setShoeStyle] = useState("");
-  const [gender, setGender] = useState("");
+  const [criteria, setCriteria] = useState({
+    category: "",
+    priceRange: "",
+    brand: "",
+    color: "",
+    shoeSize: "",
+    shoeStyle: "",
+    gender: "",
+  });
+
+  // const [category, setCategory] = useState("");
+  // const [priceRange, setPriceRange] = useState("");
+  // const [brand, setBrand] = useState("");
+  // const [color, setColor] = useState("");
+  // const [shoeSize, setShoeSize] = useState("");
+  // const [shoeStyle, setShoeStyle] = useState("");
+  // const [gender, setGender] = useState("");
 
   // Select options
   const categories = [
-    { value: "", label: "Select a category" },
-    { value: "category1", label: "Category 1" },
-    { value: "category2", label: "Category 2" },
-    { value: "category3", label: "Category 3" },
-    // ... Define options for other selects similarly ...
+    { value: "sneakers", label: "Sneakers" },
+    { value: "boots", label: "Boots" },
+    { value: "sandals", label: "Sandals" },
+    { value: "dress", label: "Dress Shoes" },
   ];
 
   const priceRanges = [
-    { value: "", label: "Select a price range" },
-    { value: "price1", label: "Under $50" },
-    { value: "price2", label: "$50 - $100" },
-    { value: "price3", label: "Above $100" },
-    // ... more price ranges ...
+    { value: "under_50", label: "Under $50" },
+    { value: "50_to_100", label: "$50 - $100" },
+    { value: "above_100", label: "Above $100" },
   ];
 
   const brands = [
-    { value: "", label: "Select a brand" },
-    { value: "brand1", label: "Brand 1" },
-    { value: "brand2", label: "Brand 2" },
-    { value: "brand3", label: "Brand 3" },
-    // ... more brands ...
+    { value: "nike", label: "Nike" },
+    { value: "adidas", label: "Adidas" },
+    { value: "puma", label: "Puma" },
+    { value: "reebok", label: "Reebok" },
   ];
 
   const colors = [
-    { value: "", label: "Select a color" },
-    { value: "color1", label: "Color 1" },
-    { value: "color2", label: "Color 2" },
-    { value: "color3", label: "Color 3" },
-    // ... more colors ...
+    { value: "black", label: "Black" },
+    { value: "white", label: "White" },
+    { value: "red", label: "Red" },
+    { value: "blue", label: "Blue" },
   ];
 
   const shoeSizes = [
-    { value: "", label: "Select a size" },
-    { value: "size1", label: "Size 1" },
-    { value: "size2", label: "Size 2" },
-    { value: "size3", label: "Size 3" },
-    // ... more shoe sizes ...
+    { value: "us_6", label: "US 6" },
+    { value: "us_7", label: "US 7" },
+    { value: "us_8", label: "US 8" },
+    { value: "us_9", label: "US 9" },
   ];
 
   const shoeStyles = [
-    { value: "", label: "Select a style" },
-    { value: "style1", label: "Style 1" },
-    { value: "style2", label: "Style 2" },
-    { value: "style3", label: "Style 3" },
-    // ... more shoe styles ...
+    { value: "casual", label: "Casual" },
+    { value: "athletic", label: "Athletic" },
+    { value: "formal", label: "Formal" },
   ];
 
   const genders = [
-    { value: "", label: "Select gender" },
     { value: "male", label: "Male" },
     { value: "female", label: "Female" },
-    { value: "kids", label: "Kids" },
-    // ... more genders ...
+    { value: "unisex", label: "Unisex" },
   ];
+
+  const handleCategoryChange = (selectedCategory) => {
+    setCriteria((prevCriteria) => ({
+      ...prevCriteria,
+      category: selectedCategory,
+    }));
+  };
+
+  const handlePriceRangeChange = (selectedPriceRange) => {
+    setCriteria((prevCriteria) => ({
+      ...prevCriteria,
+      priceRange: selectedPriceRange,
+    }));
+  };
+
+  const handleBrandChange = (selectedBrand) => {
+    setCriteria((prevCriteria) => ({
+      ...prevCriteria,
+      brand: selectedBrand,
+    }));
+  };
+
+  const handleColorChange = (selectedColor) => {
+    setCriteria((prevCriteria) => ({
+      ...prevCriteria,
+      color: selectedColor,
+    }));
+  };
+
+  const handleShoeSizeChange = (selectedShoeSize) => {
+    setCriteria((prevCriteria) => ({
+      ...prevCriteria,
+      shoeSize: selectedShoeSize,
+    }));
+  };
+
+  const handleShoeStyleChange = (selectedShoeStyle) => {
+    setCriteria((prevCriteria) => ({
+      ...prevCriteria,
+      shoeStyle: selectedShoeStyle,
+    }));
+  };
+
+  const handleGenderChange = (selectedGender) => {
+    setCriteria((prevCriteria) => ({
+      ...prevCriteria,
+      gender: selectedGender,
+    }));
+  };
+
+  const handleApplyFilters = () => {
+    onFilterChange(criteria);
+    console.log(criteria);
+  };
 
   return (
     <section className="container px-4 md:px-6 grid md:grid-cols-[240px_1fr] gap-4 items-start">
@@ -103,46 +158,48 @@ export default function Filter() {
         <Select
           placeholder="Select a category"
           options={categories}
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
+          value={criteria.category}
+          onChange={(e) => handleCategoryChange(e.target.value)}
         />
         <Select
           placeholder="Select a price range"
           options={priceRanges}
-          value={priceRange}
-          onChange={(e) => setPriceRange(e.target.value)}
+          value={criteria.priceRange}
+          onChange={(e) => handlePriceRangeChange(e.target.value)}
         />
         <Select
           placeholder="Select a brand"
           options={brands}
-          value={brand}
-          onChange={(e) => setBrand(e.target.value)}
+          value={criteria.brand}
+          onChange={(e) => handleBrandChange(e.target.value)}
         />
         <Select
           placeholder="Select a color"
           options={colors}
-          value={color}
-          onChange={(e) => setColor(e.target.value)}
+          value={criteria.color}
+          onChange={(e) => handleColorChange(e.target.value)}
         />
         <Select
           placeholder="Select a size"
           options={shoeSizes}
-          value={shoeSize}
-          onChange={(e) => setShoeSize(e.target.value)}
+          value={criteria.shoeSize}
+          onChange={(e) => handleShoeSizeChange(e.target.value)}
         />
         <Select
           placeholder="Select a style"
           options={shoeStyles}
-          value={shoeStyle}
-          onChange={(e) => setShoeStyle(e.target.value)}
+          value={criteria.shoeStyle}
+          onChange={(e) => handleShoeStyleChange(e.target.value)}
         />
         <Select
           placeholder="Select gender"
           options={genders}
-          value={gender}
-          onChange={(e) => setGender(e.target.value)}
+          value={criteria.gender}
+          onChange={(e) => handleGenderChange(e.target.value)}
         />
-        <Button variant="default">Apply Filters</Button>
+        <Button variant="default" onClick={handleApplyFilters}>
+          Apply Filters
+        </Button>
       </div>
     </section>
   );
