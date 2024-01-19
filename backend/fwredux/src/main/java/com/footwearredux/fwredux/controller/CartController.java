@@ -7,6 +7,7 @@ import com.footwearredux.fwredux.model.User;
 import com.footwearredux.fwredux.request.CartCheckoutRequest;
 import com.footwearredux.fwredux.request.CartShoeAnyRequest;
 import com.footwearredux.fwredux.response.CartCheckoutResponse;
+import com.footwearredux.fwredux.response.OrderResponse;
 import com.footwearredux.fwredux.response.ShoeProductResponse;
 import com.footwearredux.fwredux.service.CartService;
 import jakarta.validation.Valid;
@@ -50,26 +51,10 @@ public class CartController {
     }
 
     @GetMapping("/checkout")
-    ResponseEntity<CartCheckoutResponse> checkoutCartItems(
+    ResponseEntity<OrderResponse> checkoutCartItems(
             @Valid @RequestBody CartCheckoutRequest Request
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        try {
-            cartService.checkoutCart(authentication.getName());
-        } catch (NotAvailableShoeList Ex) {
-            List<String> uuids = Ex.getNotAvaliableShoes().stream().map(ShoeProduct::getUuid).toList();
-
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(
-                            CartCheckoutResponse.builder()
-                                    .error(uuids.isEmpty() ? ("Cart is empty") : ("Some items became unavailable"))
-                                    .soldItems(uuids)
-                                    .build()
-                    );
-        }
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(cartService.checkoutCart(authentication.getName(), Request));
     }
 }
