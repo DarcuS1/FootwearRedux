@@ -43,7 +43,9 @@ export default function CartComponent() {
   };
 
   const goToCheckout = () => {
+    const itemNames = cart.map((item) => item.name);
     const orderDetails = {
+      itemNames: itemNames,
       cart,
       itemQuantities,
       subtotal,

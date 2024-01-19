@@ -27,6 +27,12 @@ export default function CheckoutComponent() {
             {orderDetails.cart &&
               orderDetails.cart.map((item) => (
                 <div className="flex justify-between" key={item.id}>
+                  <div className="md:col-span-1">
+                    <h2 className="font-semibold">{item.name}</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {item.description}
+                    </p>
+                  </div>
                   <span>
                     {item.name} x {orderDetails.itemQuantities[item.id] || 1}
                   </span>

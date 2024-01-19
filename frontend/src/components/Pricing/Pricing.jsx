@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { useCart } from "../CartContext/CartCOntext";
 
 const PricingPlan = ({
   title,
@@ -6,10 +7,27 @@ const PricingPlan = ({
   description,
   features,
   isHighlighted,
+  addToCart,
 }) => {
+  const [selected, setSelected] = useState(false);
+
   const buttonClasses = isHighlighted
     ? "inline-flex justify-center w-full px-4 py-3 mt-8 font-sans text-sm leading-none text-center text-white no-underline bg-blue-600 border rounded-md cursor-pointer hover:bg-blue-700 hover:border-blue-700 hover:text-white sm:text-base md:text-lg"
     : "inline-flex justify-center w-full px-4 py-3 mt-8 font-sans text-sm leading-none text-center text-blue-600 no-underline bg-transparent border border-blue-600 rounded-md cursor-pointer hover:bg-blue-700 hover:border-blue-700 hover:text-white sm:text-base md:text-lg";
+
+  const toggleSelected = () => {
+    setSelected(!selected);
+  };
+
+  const addToCartAndToggle = () => {
+    addToCart({
+      title,
+      price,
+      description,
+      features,
+    });
+    toggleSelected();
+  };
 
   return (
     <div
@@ -60,7 +78,15 @@ const PricingPlan = ({
           </li>
         ))}
       </ul>
-      <button className={buttonClasses}>Select Plan</button>
+      {selected ? (
+        <button className={buttonClasses} disabled>
+          Selected
+        </button>
+      ) : (
+        <button className={buttonClasses} onClick={addToCartAndToggle}>
+          Add to Cart
+        </button>
+      )}
     </div>
   );
 };
@@ -101,6 +127,14 @@ const Pricing = () => {
     },
   ];
 
+  const { addToCart } = useCart();
+  const handleAddToCart = (product) => {
+    addToCart(product);
+    // Show a pop-up notification here (you can use a library like react-toastify)
+    // Example: toast.success("Product added to cart", { autoClose: 2000 });
+    toast.success("Product added to cart", { autoClose: 2000 });
+  };
+
   return (
     <section className="py-8 leading-7 text-gray-900 bg-white sm:py-12 md:py-16 lg:py-24">
       <div className="box-border px-4 mx-auto border-solid sm:px-6 md:px-6 lg:px-8 max-w-7xl">
@@ -114,7 +148,7 @@ const Pricing = () => {
         </div>
         <div className="grid grid-cols-1 gap-4 mt-4 leading-7 text-gray-900 border-0 border-gray-200 sm:mt-6 sm:gap-6 md:mt-8 md:gap-0 lg:grid-cols-3">
           {plans.map((plan, index) => (
-            <PricingPlan key={index} {...plan} />
+            <PricingPlan key={index} {...plan} addToCart={addToCart} />
           ))}
         </div>
       </div>
