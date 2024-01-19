@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar/NavBar";
 import MainHeader from "./components/Mainheader/MainHeader";
@@ -25,6 +25,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AdminComponent from "./components/AdminComponent/AdminComponent";
 import AdminComponentOrders from "./components/AdminComponentOrders/AdminComponentOrders";
+import { AuthProvider } from "./components/AuthContext/AuthContext";
 
 const Home = () => (
   <div>
@@ -135,29 +136,31 @@ const AdminPageOrders = () => (
 
 const App = () => {
   return (
-    <CartContextProvider>
-      <ToastContainer />
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/sell" element={<Sell />} />
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/about-us" element={<AboutUs />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/sign-up" element={<SignUp />} />
-          <Route path="/sign-in" element={<SignIn />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/product" element={<ProductPage />} />
-          <Route path="/product/:productId" element={<ProductPage />} />
-          <Route path="/user-info" element={<UserPage />} />
-          <Route path="/admin-products" element={<AdminPageProducts />} />
-          <Route path="/admin-orders" element={<AdminPageOrders />} />
-          {/* Add more routes as needed */}
-        </Routes>
-      </Router>
-    </CartContextProvider>
+    <AuthProvider>
+      <CartContextProvider>
+        <ToastContainer />
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/sell" element={<Sell />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/product" element={<ProductPage />} />
+            <Route path="/product/:productId" element={<ProductPage />} />
+            <Route path="/user-info" element={<UserPage />} />
+            <Route path="/admin-products" element={<AdminPageProducts />} />
+            <Route path="/admin-orders" element={<AdminPageOrders />} />
+            {/* Add more routes as needed */}
+          </Routes>
+        </Router>
+      </CartContextProvider>
+    </AuthProvider>
   );
 };
 

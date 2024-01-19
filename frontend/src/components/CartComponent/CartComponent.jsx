@@ -2,50 +2,48 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom"; // Import useHistory
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+//import { useCart } from "../CartContext/CartCOntext";
 
 export default function CartComponent() {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
-  const [updateCart, setUpdateCart] = useState(false)
-  const jwtToken = localStorage.getItem('jwtToken')
+  const [updateCart, setUpdateCart] = useState(false);
+  const jwtToken = localStorage.getItem("jwtToken");
+  //const { cartPricing } = useCart();
 
   useEffect(() => {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", `Bearer ${jwtToken}`);
 
-
     var requestOptions = {
-      method: 'GET',
+      method: "GET",
       headers: myHeaders,
       body: null,
-      redirect: 'follow'
+      redirect: "follow",
     };
 
-
-    fetch('http://localhost:8080/api/v1/cart/fetch', requestOptions)
-      .then(response => {
+    fetch("http://localhost:8080/api/v1/cart/fetch", requestOptions)
+      .then((response) => {
         if (!response.ok) {
-          console.log(`Add shoe to cart response not ok ${response}`)
+          console.log(`Add shoe to cart response not ok ${response}`);
           throw new Exception(`Add shoe to cart response not ok`);
         }
-        return response.json()
+        return response.json();
       })
-      .then(response => {
-        return response
+      .then((response) => {
+        return response;
       })
-      .then(data => {
-        setCart(data)
+      .then((data) => {
+        //const mergedCart = [...data, ...cartPricing];
+        //setCart(mergedCart);
+        setCart(data);
       })
-      .catch(error => console.error(`Error fetching cart data: ${error}`));
-
-  }, [updateCart])
+      .catch((error) => console.error(`Error fetching cart data: ${error}`));
+  }, [updateCart]); //, cartPricing]);
   // Calculate subtotal and shipping cost
-  console.log(`Cart list value: ${cart}`)
-  const subtotal = cart.reduce(
-    (total, item) => total + item.price,
-    0
-  );
+  console.log(`Cart list value: ${cart}`);
+  const subtotal = cart.reduce((total, item) => total + item.price, 0);
   const shipping = 10; // You can change this value as needed
   const total = subtotal + shipping;
 
@@ -55,33 +53,33 @@ export default function CartComponent() {
     myHeaders.append("Authorization", `Bearer ${jwtToken}`);
 
     var raw = JSON.stringify({
-      "shoeUUID": uuid
+      shoeUUID: uuid,
     });
 
     var requestOptions = {
-      method: 'DELETE',
+      method: "DELETE",
       headers: myHeaders,
       body: raw,
-      redirect: 'follow'
+      redirect: "follow",
     };
 
-    fetch('http://localhost:8080/api/v1/cart/removeshoe', requestOptions)
-      .then(response => {
+    fetch("http://localhost:8080/api/v1/cart/removeshoe", requestOptions)
+      .then((response) => {
         if (!response.ok) {
-          console.log(`Add shoe to cart response not ok ${response}`)
+          console.log(`Add shoe to cart response not ok ${response}`);
           throw new Exception(`Add shoe to cart response not ok`);
         }
-        setUpdateCart(!updateCart)
+        setUpdateCart(!updateCart);
         toast.success("Successfully removed item", {
-          position: "top-center"
-        })
+          position: "top-center",
+        });
       })
       .catch((e) => {
         toast.error(`Failed to remove item from cart`, {
-          position: "top-center"
-        })
-      })
-  }
+          position: "top-center",
+        });
+      });
+  };
 
   const goToCheckout = () => {
     const itemNames = cart.map((item) => item.name);

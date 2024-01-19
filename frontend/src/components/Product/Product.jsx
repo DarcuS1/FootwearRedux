@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useCart } from "../CartContext/CartCOntext";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Product = ({ criteria }) => {
   const [products, setProducts] = useState([]);
-  const jwtToken = localStorage.getItem('jwtToken')
+  const jwtToken = localStorage.getItem("jwtToken");
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -15,20 +16,25 @@ const Product = ({ criteria }) => {
         };
         console.log(requestBody);
 
-        const response = await fetch("http://localhost:8080/api/v1/shoes/fetch", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestBody),
-          redirect: 'follow'
-        });
+        const response = await fetch(
+          "http://localhost:8080/api/v1/shoes/fetch",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+            redirect: "follow",
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch shoe products");
         }
 
-        const data = (await response.json()).filter((v, _) => { return v.coverImageUuid !== "" });
+        const data = (await response.json()).filter((v, _) => {
+          return v.coverImageUuid !== "";
+        });
         setProducts(data);
       } catch (error) {
         console.error("Error fetching shoe products:", error);
@@ -38,7 +44,7 @@ const Product = ({ criteria }) => {
     fetchProducts();
   }, [criteria]);
 
-  const { addToCart } = useCart();
+  //const { addToCart } = useCart();
 
   const handleAddToCart = (product) => {
     var myHeaders = new Headers();
@@ -46,43 +52,54 @@ const Product = ({ criteria }) => {
     myHeaders.append("Authorization", `Bearer ${jwtToken}`);
 
     var raw = JSON.stringify({
-      "shoeUUID": product.productUUID
+      shoeUUID: product.productUUID,
     });
 
     var requestOptions = {
-      method: 'POST',
+      method: "POST",
       headers: myHeaders,
       body: raw,
-      redirect: 'follow'
+      redirect: "follow",
     };
 
     fetch("http://localhost:8080/api/v1/cart/addshoe", requestOptions)
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
-          console.log(`Add shoe to cart response not ok ${response}`)
+          console.log(`Add shoe to cart response not ok ${response}`);
           throw new Exception(`Add shoe to cart response not ok`);
         }
       })
-      .then(responseText => {
+      .then((responseText) => {
         toast.success("Product added to cart", { autoClose: 2000 });
       })
-      .catch(err => {
-        toast.error("Failed to add product to cart", { position: "top-center" })
-      })
+      .catch((err) => {
+        toast.error("Failed to add product to cart", {
+          position: "top-center",
+        });
+      });
+  };
 
+  const navigate = useNavigate();
+
+  const handleImageClick = (productId) => {
+    navigate(`/product/${productId}`); // Navigate to the product page
   };
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-10">
       {products.map((product) => (
-        <div key={product.id} className="rounded-lg overflow-hidden shadow-lg">
+        <div
+          key={product.productUUID}
+          className="rounded-lg overflow-hidden shadow-lg"
+        >
           <img
             src={`http://localhost:8080/api/v1/shoe_images/fetch/${product.coverImageUuid}`}
             height="300"
             width="300"
             alt="Product Image"
             style={{ aspectRatio: "200 / 200", objectFit: "cover" }}
-          />
+            onClick={() => handleImageClick(product.productUUID)}
+          ></img>
           <div className="p-4">
             <h2 className="font-semibold text-lg">{product.name}</h2>
             <p className="text-gray-700">{product.description}</p>
