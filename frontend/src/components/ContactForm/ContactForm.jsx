@@ -17,10 +17,7 @@ const ContactForm = () => {
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col lg:flex-row">
           <div className="relative w-full bg-cover lg:w-6/12 xl:w-7/12 bg-gradient-to-r from-white via-white to-gray-100">
-            <div
-              className="relative flex flex-col items-center justify-center w-full h-full px-10 my-20 lg:px-16 lg:my-0 tails-selected-element"
-              contenteditable="true"
-            >
+            <div className="relative flex flex-col items-center justify-center w-full h-full px-10 my-20 lg:px-16 lg:my-0 tails-selected-element">
               <div className="flex flex-col items-start space-y-8 tracking-tight lg:max-w-3xl">
                 <div className="relative">
                   <p className="mb-2 font-medium text-gray-700 uppercase">
@@ -103,7 +100,7 @@ const ContactForm = () => {
                   </button>
                   <a
                     href="#_"
-                    class="inline-block w-full px-5 py-4 mt-3 text-lg font-bold text-center text-gray-900 transition duration-200 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 ease tails-selected-element"
+                    className="inline-block w-full px-5 py-4 mt-3 text-lg font-bold text-center text-gray-900 transition duration-200 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 ease tails-selected-element"
                     data-rounded="rounded-lg"
                   >
                     Our contacts
