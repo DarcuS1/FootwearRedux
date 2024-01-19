@@ -41,10 +41,35 @@ const Product = ({ criteria }) => {
   const { addToCart } = useCart();
 
   const handleAddToCart = (product) => {
-    addToCart(product);
-    // Show a pop-up notification here (you can use a library like react-toastify)
-    // Example: toast.success("Product added to cart", { autoClose: 2000 });
-    toast.success("Product added to cart", { autoClose: 2000 });
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${jwtToken}`);
+
+    var raw = JSON.stringify({
+      "shoeUUID": product.productUUID
+    });
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+
+    fetch("http://localhost:8080/api/v1/cart/addshoe", requestOptions)
+      .then(response => {
+        if (!response.ok) {
+          console.log(`Add shoe to cart response not ok ${response}`)
+          throw new Exception(`Add shoe to cart response not ok`);
+        }
+      })
+      .then(responseText => {
+        toast.success("Product added to cart", { autoClose: 2000 });
+      })
+      .catch(err => {
+        toast.error("Failed to add product to cart", { position: "top-center" })
+      })
+
   };
 
   return (

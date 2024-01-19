@@ -33,14 +33,14 @@ const Button = ({ children, variant, ...props }) => {
 export default function Filter({ onFilterChange }) {
   // State for each select
   const [criteria, setCriteria] = useState({
-    category: "",
-    priceMin: "",
-    priceMax: "",
-    brand: "",
-    color: "",
-    shoeSize: "",
-    shoeStyle: "",
-    gender: "",
+    category: null,
+    priceMin: null,
+    priceMax: null,
+    brand: null,
+    color: null,
+    shoeSize: null,
+    shoeStyle: null,
+    gender: null,
   });
 
   // const [category, setCategory] = useState("");
@@ -103,7 +103,7 @@ export default function Filter({ onFilterChange }) {
   const handleCategoryChange = (selectedCategory) => {
     setCriteria((prevCriteria) => ({
       ...prevCriteria,
-      category: selectedCategory,
+      category: selectedCategory === "" ? (null) : (selectedCategory),
     }));
   };
 
@@ -124,8 +124,8 @@ export default function Filter({ onFilterChange }) {
         priceMax = Infinity; // or a large number to represent 'above $100'
         break;
       default:
-        // Handle unexpected values
-        throw new Error("Invalid price range");
+        priceMin = null
+        priceMax = null
     }
 
     return { priceMin, priceMax };
@@ -144,35 +144,35 @@ export default function Filter({ onFilterChange }) {
   const handleBrandChange = (selectedBrand) => {
     setCriteria((prevCriteria) => ({
       ...prevCriteria,
-      brand: selectedBrand,
+      brand: selectedBrand === "" ? (null) : (selectedBrand),
     }));
   };
 
   const handleColorChange = (selectedColor) => {
     setCriteria((prevCriteria) => ({
       ...prevCriteria,
-      color: selectedColor,
+      color: color === "" ? (null) : (color),
     }));
   };
 
   const handleShoeSizeChange = (selectedShoeSize) => {
     setCriteria((prevCriteria) => ({
       ...prevCriteria,
-      shoeSize: selectedShoeSize,
+      shoeSize: shoeSize === "" ? (null) : (shoeSize),
     }));
   };
 
   const handleShoeStyleChange = (selectedShoeStyle) => {
     setCriteria((prevCriteria) => ({
       ...prevCriteria,
-      shoeStyle: selectedShoeStyle,
+      shoeStyle: shoeStyle === "" ? (null) : (shoeStyle),
     }));
   };
 
   const handleGenderChange = (selectedGender) => {
     setCriteria((prevCriteria) => ({
       ...prevCriteria,
-      gender: selectedGender,
+      gender: gender === "" ? (null) : (gender.toUpperCase()),
     }));
   };
 

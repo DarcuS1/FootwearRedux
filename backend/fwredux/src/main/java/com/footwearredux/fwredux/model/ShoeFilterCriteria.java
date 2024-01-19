@@ -22,5 +22,5 @@ public class ShoeFilterCriteria {
     private String shoeStyle;
 
     private GenderRole gender;
-    private Integer sellerId;
+    private String sellerUuid;
 }
