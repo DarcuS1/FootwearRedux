@@ -10,6 +10,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -27,6 +30,7 @@ public class ShoeProductResponse {
     private String coverImageUuid;
     private String sellerUUID;
     private String description;
+    private List<String> additionalImages;
 
     public ShoeProductResponse(ShoeProduct product) {
         this.productUUID = product.getUuid();
@@ -40,6 +44,7 @@ public class ShoeProductResponse {
         this.gender = product.getGender();
         try {
             this.coverImageUuid = product.getImages().getCoverImage().getUuid();
+            this.additionalImages = product.getImages().getImages().stream().map((img) -> img.getUuid()).collect(Collectors.toList());
         } catch (Exception ex) {
             this.coverImageUuid = "";
         }

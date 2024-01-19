@@ -35,7 +35,7 @@ const SignUpComponent = () => {
       });
 
       if (!registrationResponse.ok) {
-        throw new Error(`HTTP error! Status: ${registrationResponse.status}`);
+        throw new Error(`HTTP error! Status: ${registrationResponse.status}`)
       }
 
       const registrationData = await registrationResponse.json();

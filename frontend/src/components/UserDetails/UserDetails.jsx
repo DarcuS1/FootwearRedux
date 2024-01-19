@@ -44,7 +44,7 @@ export default function UserDetails() {
           alt="User Avatar"
           className="w-12 h-12 rounded-full mr-4"
           src={
-            user.avatar || "https://generated.vusercontent.net/placeholder.svg"
+            `http://localhost:8080/api/v1/user/image/${user.uuid}`
           }
         />
         <div>
