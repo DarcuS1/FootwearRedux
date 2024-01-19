@@ -1,18 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../AuthContext/AuthContext";
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [currentPage, setCurrentPage] = useState("home");
   const [showSearch, setShowSearch] = useState(false);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Modify this based on your authentication logic
+  const { isLoggedIn } = useContext(AuthContext);
+  // Modify this based on your authentication logic
   const [username, setUsername] = useState("User");
 
   const handleNavLinkClick = (page) => {
     setCurrentPage(page);
     setShowSearch(false);
     setShowMenu(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("jwtToken");
+    setIsLoggedIn(false);
   };
 
   const isCurrentPage = (page) => {
@@ -87,7 +94,7 @@ const Navbar = () => {
               Contact
             </Link>
             {/* More links as per your requirement */}
-            <div className="relative py-2 mt-6 ml-6 mr-2 lg:inline-block md:mt-0 md:ml-2 lg:mx-3 md:relative">
+            {/* <div className="relative py-2 mt-6 ml-6 mr-2 lg:inline-block md:mt-0 md:ml-2 lg:mx-3 md:relative">
               <svg
                 onClick={() => setShowSearch(!showSearch)}
                 className="inline w-5 h-5 cursor-pointer text-gray-600"
@@ -107,12 +114,25 @@ const Navbar = () => {
                   className="absolute ml-1  p-2 border rounded-lg focus:outline-none focus:ring top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
                 />
               )}
-            </div>
+            </div> */}
 
             <div className="flex flex-col items-start justify-end w-full pt-4 md:items-center md:w-1/3 md:flex-row md:py-0">
               {isLoggedIn ? (
                 <div className="ml-6 text-gray-700 md:mr-2 lg:mr-3 md:w-auto">
-                  Hi, {username}
+                  <Link
+                    to="/user-info"
+                    className="w-full px-3 py-2 mr-0 ml-6 text-gray-700 md:mr-2 lg:mr-3 md:w-auto"
+                    onClick={() => handleNavLinkClick("user-info")}
+                  >
+                    Hi, {username}
+                  </Link>
+                  <Link
+                    to=""
+                    className="inline-flex items-end ml-6 w-full px-6 py-3 text-sm font-medium leading-4 text-white bg-indigo-600 md:px-3 md:w-auto md:rounded-full lg:px-5 hover:bg-indigo-500 focus:outline-none md:focus:ring-2 focus:ring-0 focus:ring-offset-2 focus:ring-indigo-600"
+                    onClick={() => handleLogout()}
+                  >
+                    Logout
+                  </Link>
                 </div>
               ) : (
                 <>

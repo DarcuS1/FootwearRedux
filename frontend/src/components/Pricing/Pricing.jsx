@@ -7,7 +7,7 @@ const PricingPlan = ({
   description,
   features,
   isHighlighted,
-  addToCart,
+  addToCartPricing,
 }) => {
   const [selected, setSelected] = useState(false);
 
@@ -20,7 +20,7 @@ const PricingPlan = ({
   };
 
   const addToCartAndToggle = () => {
-    addToCart({
+    addToCartPricing({
       title,
       price,
       description,
@@ -127,9 +127,9 @@ const Pricing = () => {
     },
   ];
 
-  const { addToCart } = useCart();
+  const { addToCartPricing } = useCart();
   const handleAddToCart = (product) => {
-    addToCart(product);
+    addToCartPricing(product);
     // Show a pop-up notification here (you can use a library like react-toastify)
     // Example: toast.success("Product added to cart", { autoClose: 2000 });
     toast.success("Product added to cart", { autoClose: 2000 });
@@ -148,7 +148,11 @@ const Pricing = () => {
         </div>
         <div className="grid grid-cols-1 gap-4 mt-4 leading-7 text-gray-900 border-0 border-gray-200 sm:mt-6 sm:gap-6 md:mt-8 md:gap-0 lg:grid-cols-3">
           {plans.map((plan, index) => (
-            <PricingPlan key={index} {...plan} addToCart={addToCart} />
+            <PricingPlan
+              key={index}
+              {...plan}
+              addToCartPricing={addToCartPricing}
+            />
           ))}
         </div>
       </div>

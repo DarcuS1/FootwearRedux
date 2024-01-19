@@ -224,21 +224,28 @@
 //     </svg>
 //   );
 // }
+
 import React, { useState, useEffect } from "react";
 
 export default function AdminComponent() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hiddenProductIds, setHiddenProductIds] = useState([]);
+  const requestBody = {
+    pageIndex: 0,
+    criteria: null,
+  };
 
   // Fetch products from your API
   useEffect(() => {
     // Replace 'your-api-endpoint' with your actual API endpoint
-    fetch("/api/v1/shoes/fetch", {
+    fetch("http://localhost:8080/api/v1/shoes/fetch", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ pageIndex: 0 }), // Adjust the request body as needed
+      body: JSON.stringify(requestBody),
+      redirect: "follow",
     })
       .then((response) => {
         if (!response.ok) {
@@ -260,23 +267,28 @@ export default function AdminComponent() {
     // Send a DELETE request to your API to delete the product by productId
     // You need to implement this logic based on your API structure
     // After deleting, you can update the products state accordingly
+    setHiddenProductIds([...hiddenProductIds, productId]);
   };
+
+  const filteredProducts = products.filter(
+    (product) => !hiddenProductIds.includes(product.productUUID)
+  );
 
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
-      <div className="hidden border-r bg-gray-100/40 lg:block ">
+      <div className="hidden border-r bg-gray-100/40 lg:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex-1 overflow-auto py-2">
             <nav className="grid items-start px-4 text-sm font-medium">
               <a
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 "
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900"
                 href="/admin-orders"
               >
                 <ShoppingCartIcon className="h-4 w-4" />
                 Orders
               </a>
               <a
-                className="flex items-center gap-3 rounded-lg bg-gray-100 px-3 py-2 text-gray-900  transition-all hover:text-gray-900 "
+                className="flex items-center gap-3 rounded-lg bg-gray-100 px-3 py-2 text-gray-900 transition-all hover:text-gray-900"
                 href="/admin-products"
               >
                 <PackageIcon className="h-4 w-4" />
@@ -287,7 +299,7 @@ export default function AdminComponent() {
         </div>
       </div>
       <div className="flex flex-col">
-        <header className="flex h-14 lg:h-[60px] items-center gap-4 border-b bg-gray-100/40 px-6 ">
+        <header className="flex h-14 lg:h-[60px] items-center gap-4 border-b bg-gray-100/40 px-6">
           <a className="lg:hidden" href="#">
             <Package2Icon className="h-6 w-6" />
             <span className="sr-only">Home</span>
@@ -295,9 +307,9 @@ export default function AdminComponent() {
           <div className="w-full flex-1">
             <form>
               <div className="relative">
-                <SearchIcon className="absolute left-2.5 top-1 h-4 w-4 text-gray-500 " />
+                <SearchIcon className="absolute left-2.5 top-1 h-4 w-4 text-gray-500" />
                 <input
-                  className="w-full bg-white shadow-none appearance-none pl-8 md:w-2/3 lg:w-1/3 "
+                  className="w-full bg-white shadow-none appearance-none pl-8 md:w-2/3 lg:w-1/3"
                   placeholder="Search products..."
                   type="search"
                 />
@@ -318,36 +330,34 @@ export default function AdminComponent() {
             </a>
           </div>
           <div className="border shadow-sm rounded-lg">
-            <table className="min-w-full">
+            <table className="min-w-full border-collapse">
               <thead>
                 <tr>
-                  <th className="w-[80px]">Image</th>
-                  <th className="max-w-[150px]">Name</th>
-                  <th className="hidden md:table-cell">Status</th>
-                  <th className="hidden md:table-cell">Inventory</th>
-                  <th>Vendor</th>
-                  <th>Action</th>
+                  <th className="w-[80px] border p-2">Image</th>
+                  <th className="max-w-[150px] border p-2">Name</th>
+                  <th className="border p-2">Vendor</th>
+                  <th className="border p-2">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {products.map((product) => (
-                  <tr key={product.id}>
-                    <td>
+                {filteredProducts.map((product) => (
+                  <tr key={product.productUUID} className="border-b">
+                    <td className="border p-2">
                       <img
                         alt="Product image"
                         className="aspect-square rounded-md object-cover"
                         height="64"
-                        src={product.imageUrl}
+                        src={`http://localhost:8080/api/v1/shoe_images/fetch/${product.coverImageUuid}`}
                         width="64"
                       />
                     </td>
-                    <td className="font-medium">{product.name}</td>
-                    <td className="hidden md:table-cell">{product.status}</td>
-                    <td>{`${product.inventory} in stock`}</td>
-                    <td className="hidden md:table-cell">{product.vendor}</td>
-                    <td>
+                    <td className="font-medium border p-2">
+                      {product.shoeName}
+                    </td>
+                    <td className="border p-2">{product.sellerUUID}</td>
+                    <td className="border p-2">
                       <button
-                        onClick={() => handleDelete(product.id)}
+                        onClick={() => handleDelete(product.productUUID)}
                         className="text-red-500 hover:text-red-600"
                       >
                         Delete
@@ -364,7 +374,6 @@ export default function AdminComponent() {
   );
 }
 
-// ... Other icon components ...
 function Package2Icon(props) {
   return (
     <svg
