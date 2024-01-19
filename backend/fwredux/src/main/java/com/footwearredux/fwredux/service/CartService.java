@@ -86,19 +86,23 @@ public class CartService {
 
         shoeProductService.makeShoeListSold(cart.getProducts());
 
+        List<ShoeProduct> productsForOrder = new ArrayList<>(cart.getProducts());
+        Order order = orderRepository.save(Order.builder()
+                .email(request.getEmail())
+                .address(request.getAddress())
+                .country(request.getCountry())
+                .city(request.getCity())
+                .fullName(request.getFullName())
+                .state(request.getState())
+                .postalCode(request.getPostalCode())
+                .phoneNumber(request.getPhoneNumber())
+                .products(productsForOrder)
+                .user(cart.getUser())
+                .build());
+
         cart.getProducts().clear();
         cartRepository.save(cart);
 
-        Order order = orderRepository.save(Order.builder()
-                        .address(request.getAddress())
-                        .country(request.getCountry())
-                        .city(request.getCity())
-                        .fullName(request.getFullName())
-                        .state(request.getState())
-                        .postalCode(request.getPostalCode())
-                        .phoneNumber(request.getPhoneNumber())
-                        .products(cart.getProducts())
-                .build());
 
         return new OrderResponse(order);
     }

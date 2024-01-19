@@ -50,7 +50,7 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/checkout")
+    @PostMapping("/checkout")
     ResponseEntity<OrderResponse> checkoutCartItems(
             @Valid @RequestBody CartCheckoutRequest Request
     ) {

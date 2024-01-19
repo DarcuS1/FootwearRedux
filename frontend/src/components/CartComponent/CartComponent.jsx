@@ -88,7 +88,6 @@ export default function CartComponent() {
     const orderDetails = {
       itemNames: itemNames,
       cart,
-      itemQuantities,
       subtotal,
       shipping,
       total,

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -37,6 +38,8 @@ const UploadForm = () => {
   const [secondImage, setSecondImage] = useState(null);
   const [thirdImage, setThirdImage] = useState(null);
   const [fourthImage, setFourthImage] = useState(null);
+
+  const navigator = useNavigate();
 
   // Option arrays for Select components
   const categories = [
@@ -111,6 +114,8 @@ const UploadForm = () => {
     } catch (error) {
       console.error('There has been a problem with your fetch operation:', error);
     }
+
+    navigator('/home')
   }
 
   const jwtToken = localStorage.getItem('jwtToken')
