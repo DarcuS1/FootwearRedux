@@ -69,4 +69,10 @@ public class ShoeProductController {
 
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("fetchSingleProduct/{uuid}")
+    private ResponseEntity<ShoeProductResponse> fetchSingleProduct(@PathVariable String uuid) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok(shoeProductService.fetchSingleProduct(uuid));
+    }
 }

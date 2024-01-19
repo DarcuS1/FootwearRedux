@@ -7,18 +7,15 @@ import com.footwearredux.fwredux.repository.ShoeCategorySpecification;
 import com.footwearredux.fwredux.repository.ShoeProductRepository;
 import com.footwearredux.fwredux.repository.UserRepository;
 import com.footwearredux.fwredux.request.AddShoeProductRequest;
-import com.footwearredux.fwredux.request.ShoeProductFetchRequest;
 import com.footwearredux.fwredux.response.ShoeProductResponse;
-import jakarta.annotation.PostConstruct;
-import jdk.jfr.Frequency;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.plaf.PanelUI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -84,6 +81,13 @@ public class ShoeProductService {
         }
 
         shoeProductRepository.deleteByUuid(uuid);
+
+    }
+
+    public ShoeProductResponse fetchSingleProduct(String uuid){
+       Optional<ShoeProduct> product = shoeProductRepository.findByUuid(uuid);
+
+        return new ShoeProductResponse(product.get());
 
     }
 
