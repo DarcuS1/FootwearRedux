@@ -2,6 +2,7 @@ package com.footwearredux.fwredux.service;
 
 import com.footwearredux.fwredux.exception.InvalidShoeStateTransition;
 import com.footwearredux.fwredux.model.*;
+import com.footwearredux.fwredux.repository.ShoeCategoryRepository;
 import com.footwearredux.fwredux.repository.ShoeCategorySpecification;
 import com.footwearredux.fwredux.repository.ShoeProductRepository;
 import com.footwearredux.fwredux.repository.UserRepository;
@@ -9,6 +10,7 @@ import com.footwearredux.fwredux.request.AddShoeProductRequest;
 import com.footwearredux.fwredux.request.ShoeProductFetchRequest;
 import com.footwearredux.fwredux.response.ShoeProductResponse;
 import jakarta.annotation.PostConstruct;
+import jdk.jfr.Frequency;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ShoeProductService {
     private final ShoeProductRepository shoeProductRepository;
+    private final ShoeCategoryRepository shoeCategoryRepository;
     private final UserRepository userRepository;
 
     public List<ShoeProductResponse> fetchShoes(int PageIndex, ShoeFilterCriteria Criteria) {
@@ -52,8 +55,12 @@ public class ShoeProductService {
 
         User user = optUser.get();
 
+        ShoeCategory shoeCategory = shoeCategoryRepository.save(ShoeCategory.builder()
+                .name(Request.getCategory())
+                .build());
+
         ShoeProduct shoe = ShoeProduct.builder()
-                .shoeCategory(null)
+                .shoeCategory(shoeCategory)
                 .shoeState(ShoeState.AVALIABLE)
                 .shoeName(Request.getShoeName())
                 .price(Request.getPrice())

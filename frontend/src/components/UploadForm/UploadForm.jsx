@@ -256,17 +256,22 @@ const UploadForm = () => {
       return;
     }
 
-    uploadShoeProduct(shoeData).then(shoeUuid => {
+    uploadShoeProduct(shoeData).then(async shoeUuid => {
       if (shoeUuid) {
         // Upload the cover image
         // Assuming 'coverImageFile' is the file you want to upload
-        uploadCoverImage(shoeUuid, coverImage.file);
+        await uploadCoverImage(shoeUuid, coverImage.file);
 
         // Upload additional images
         // Assuming 'additionalImageFiles' is an array of files
-        uploadAdditionalImage(shoeUuid, secondImage.file);
-        uploadAdditionalImage(shoeUuid, thirdImage.file);
-        uploadAdditionalImage(shoeUuid, fourthImage.file);
+        await uploadAdditionalImage(shoeUuid, secondImage.file);
+        await uploadAdditionalImage(shoeUuid, thirdImage.file);
+        await uploadAdditionalImage(shoeUuid, fourthImage.file);
+
+        toast.success("Successfully added item", {
+          position: "top-center"
+        })
+        navigator("/home")
       }
     });
 

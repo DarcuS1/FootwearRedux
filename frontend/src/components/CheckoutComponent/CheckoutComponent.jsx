@@ -149,21 +149,6 @@ export default function CheckoutComponent() {
     });
   };
 
-  const handlePlaceOrder = () => {
-    const paymentType = document.getElementById("paymentType").value;
-    if (paymentType === "courierPay") {
-      // Display toast and navigate to the home page
-      toast.success("Order placed successfully by courier!", {
-        autoClose: 2000,
-      });
-      navigate("/home");
-    } else {
-      toast.error("PAY BY PAYPAL OR CARD", {
-        autoClose: 2000,
-      });
-    }
-  };
-
   return (
     <PayPalScriptProvider
       options={{

@@ -22,7 +22,7 @@ public class ShoeCategorySpecification implements Specification<ShoeProduct> {
         List<Predicate> predicates = new ArrayList<>();
 
         if (shoeProduct.getCategory() != null && !shoeProduct.getCategory().equals("")) {
-            predicates.add(criteriaBuilder.equal(root.get("shoeCategory"), shoeProduct.getCategory()));
+            predicates.add(criteriaBuilder.equal(root.get("shoeCategory").get("name"), shoeProduct.getCategory()));
         }
 
         if (shoeProduct.getPriceMin() != null) {

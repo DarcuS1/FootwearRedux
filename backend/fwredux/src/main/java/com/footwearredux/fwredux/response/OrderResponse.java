@@ -22,6 +22,7 @@ public class OrderResponse {
     private String state;
     private String country;
     private String postalCode;
+    private Integer totalSum;
     private List<ShoeProductResponse> shoeList;
     public OrderResponse(Order order) {
         this.fullName = order.getFullName();
@@ -36,5 +37,6 @@ public class OrderResponse {
                 .stream()
                 .map((p) -> new ShoeProductResponse(p))
                 .collect(Collectors.toList());
+        this.totalSum = shoeList.stream().reduce(0, (subtotal, element) -> subtotal + element.getPrice(), Integer::sum);
     }
 }
