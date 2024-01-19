@@ -22,7 +22,9 @@ import UserInfo from "./components/UserInfo/UserInfo";
 import ShopComponent from "./components/ShopComponent/ShopComponent";
 import { CartContextProvider } from "./components/CartContext/CartCOntext";
 import { ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
+import AdminComponent from "./components/AdminComponent/AdminComponent";
+import AdminComponentOrders from "./components/AdminComponentOrders/AdminComponentOrders";
 
 const Home = () => (
   <div>
@@ -115,6 +117,22 @@ const UserPage = () => (
   </div>
 );
 
+const AdminPageProducts = () => (
+  <div>
+    <Navbar />
+    <AdminComponent />
+    <Footer />
+  </div>
+);
+
+const AdminPageOrders = () => (
+  <div>
+    <Navbar />
+    <AdminComponentOrders />
+    <Footer />
+  </div>
+);
+
 const App = () => {
   return (
     <CartContextProvider>
@@ -134,6 +152,8 @@ const App = () => {
           <Route path="/product" element={<ProductPage />} />
           <Route path="/product/:productId" element={<ProductPage />} />
           <Route path="/user-info" element={<UserPage />} />
+          <Route path="/admin-products" element={<AdminPageProducts />} />
+          <Route path="/admin-orders" element={<AdminPageOrders />} />
           {/* Add more routes as needed */}
         </Routes>
       </Router>
