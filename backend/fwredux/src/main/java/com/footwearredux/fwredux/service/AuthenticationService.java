@@ -6,6 +6,7 @@ import com.footwearredux.fwredux.repository.UserRepository;
 import com.footwearredux.fwredux.request.AuthenticationRequest;
 import com.footwearredux.fwredux.request.RegisterRequest;
 import com.footwearredux.fwredux.response.AuthenticationResponse;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,6 +23,35 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+
+    @PostConstruct
+    private void generateAdmin() {
+        if(repository.findUserByEmail("admin@admin.com").isPresent()) {
+            return;
+        }
+        AuthenticationResponse res = registerAdmin();
+    }
+
+    public AuthenticationResponse registerAdmin() {
+        try {
+            var user = User.builder()
+                    .firstName("admin")
+                    .lastname("admin")
+                    .email("admin@admin.com")
+                    .password(passwordEncoder.encode("admin"))
+                    .role(UserRole.ADMIN)
+                    .build();
+            repository.save(user);
+            var jwtToken = jwtService.generateToken(user);
+            return AuthenticationResponse.builder()
+                    .token(jwtToken)
+                    .build();
+        } catch (DataIntegrityViolationException ex) {
+            return AuthenticationResponse.builder()
+                    .error("Failed to create admin account")
+                    .build();
+        }
+    }
 
     public AuthenticationResponse register(RegisterRequest request) {
 

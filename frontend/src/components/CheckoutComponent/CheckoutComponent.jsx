@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { toast } from "react-toastify";
@@ -19,8 +19,51 @@ const Button = ({ children, ...props }) => {
 export default function CheckoutComponent() {
   const location = useLocation();
   const orderDetails = location.state?.orderDetails || {};
+  const navigate = useNavigate();
+  const jwtToken = localStorage.getItem('jwtToken')
 
-  // Function to create an order with PayPal
+  const [fullName, setFullName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [country, setCountry] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+
+  const formDataRef = useRef({
+    fullName: '',
+    phoneNumber: '',
+    email: '',
+    address: '',
+    city: '',
+    state: '',
+    country: '',
+    postalCode: ''
+  });
+
+  // Update the ref whenever state changes
+  useEffect(() => {
+    formDataRef.current = {
+      fullName,
+      phoneNumber,
+      email,
+      address,
+      city,
+      state,
+      country,
+      postalCode
+    };
+  }, [fullName, phoneNumber, email, address, city, state, country, postalCode]);
+
+  const onPaypalButtonClick = (e) => {
+    const { fullName, phoneNumber, email, address, city, state, country, postalCode } = formDataRef.current;
+    if (!fullName || !phoneNumber || !email || !address || !city || !state || !country || !postalCode) {
+      toast.error("All fields must be filled!", { position: "top-center" });
+      e.stopPropagation();
+    }
+  }
+
   const createOrder = (data, actions) => {
     return actions.order.create({
       purchase_units: [
@@ -33,19 +76,14 @@ export default function CheckoutComponent() {
     });
   };
 
-  // Function to handle approval of payment
-  const onApprove = (data, actions) => {
-    return actions.order.capture().then((details) => {
-      // Handle successful payment here
-      toast.success("HURRAY YOU DID IT", 2000);
-      console.log("Payment Successful:", details);
-
-      navigate("/home");
-      // Redirect to success page or update the UI accordingly
-    });
-  };
-
   const handlePlaceOrder = () => {
+    if (!fullName || !phoneNumber || !email || !address || !city || !state || !country || !postalCode) {
+      toast.error("All fields must be filled!", {
+        position: "top-center"
+      })
+      return null
+    }
+
     const paymentType = document.getElementById("paymentType").value;
     if (paymentType === "courierPay") {
       // Display toast and navigate to the home page
@@ -58,6 +96,57 @@ export default function CheckoutComponent() {
         autoClose: 2000,
       });
     }
+  };
+
+  // Function to handle approval of payment
+  const onApprove = async (data, actions) => {
+    return actions.order.capture().then(async (details) => {
+      // Handle successful payment here
+      toast.success("HURRAY YOU DID IT", 2000);
+      console.log("Payment Successful:", details);
+
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("Authorization", `Bearer ${jwtToken}`);
+
+      const { fullName, phoneNumber, email, address, city, state, country, postalCode } = formDataRef.current;
+      var raw = JSON.stringify({
+        "fullName": fullName,
+        "phoneNumber": phoneNumber,
+        "email": email,
+        "address": address,
+        "city": city,
+        "state": state,
+        "country": country,
+        "postalCode": postalCode
+      });
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+      };
+
+      try {
+        const response = await fetch('http://localhost:8080/api/v1/cart/checkout', requestOptions);
+
+        if (!response.ok) {
+          console.log(`Checkout cart response not ok: ${response.status}`);
+          throw new Error(`Checkout cart response not ok: status ${response.status}`);
+        }
+
+        toast.success("Successfully checkout", {
+          position: "top-center"
+        });
+      } catch (e) {
+        console.error('Checkout failed:', e);
+        toast.error(`Checkout failed`, {
+          position: "top-center"
+        });
+      }
+      navigate("/home");
+    });
   };
 
   return (
@@ -80,20 +169,20 @@ export default function CheckoutComponent() {
             <div className="space-y-2">
               {orderDetails.cart &&
                 orderDetails.cart.map((item) => (
-                  <div className="flex justify-between" key={item.id}>
+                  <div className="flex justify-between" key={item.productUUID}>
                     <div className="md:col-span-1">
-                      <h2 className="font-semibold">{item.name}</h2>
+                      <h2 className="font-semibold">{item.shoeName}</h2>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {item.description}
                       </p>
                     </div>
                     <span>
-                      {item.name} x {orderDetails.itemQuantities[item.id] || 1}
+                      {item.shoeName} x {1}
                     </span>
                     <span>
                       $
                       {(
-                        item.price * (orderDetails.itemQuantities[item.id] || 1)
+                        item.price
                       ).toFixed(2)}
                     </span>
                   </div>
@@ -108,35 +197,54 @@ export default function CheckoutComponent() {
           {/* Shipping Information */}
           <div className="bg-white rounded-lg shadow p-4 md:p-6 space-y-4">
             <h2 className="text-xl font-semibold">Shipping Information</h2>
-            <form className="space-y-2">
+            <form className="space-y-2" onSubmit={(e) => { e.stopPropagation() }}>
               <input
                 className="border rounded p-2 w-full"
                 placeholder="Full Name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
               />
               <input
                 className="border rounded p-2 w-full"
                 placeholder="Phone Number"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
               />
               <input
                 className="border rounded p-2 w-full"
                 placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <input
                 className="border rounded p-2 w-full"
                 placeholder="Address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
               />
-              <input className="border rounded p-2 w-full" placeholder="City" />
+              <input
+                className="border rounded p-2 w-full"
+                placeholder="City"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+              />
               <input
                 className="border rounded p-2 w-full"
                 placeholder="State/Province"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
               />
               <input
                 className="border rounded p-2 w-full"
                 placeholder="Country"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
               />
               <input
                 className="border rounded p-2 w-full"
                 placeholder="Postal Code"
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)}
               />
             </form>
           </div>
@@ -160,11 +268,11 @@ export default function CheckoutComponent() {
           </div>
           <div className="bg-white rounded-lg shadow p-4 md:p-6 space-y-4">
             <h2 className="text-xl font-semibold">Payment Information</h2>
-            <PayPalButtons createOrder={createOrder} onApprove={onApprove} />
+            <PayPalButtons onClick={onPaypalButtonClick} createOrder={createOrder} onApprove={onApprove} />
           </div>
           <Button onClick={handlePlaceOrder}>Place Order</Button>
         </div>
       </div>
-    </PayPalScriptProvider>
+    </PayPalScriptProvider >
   );
 }

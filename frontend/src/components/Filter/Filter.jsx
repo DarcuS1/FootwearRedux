@@ -33,14 +33,14 @@ const Button = ({ children, variant, ...props }) => {
 export default function Filter({ onFilterChange }) {
   // State for each select
   const [criteria, setCriteria] = useState({
-    category: "",
-    priceMin: "",
-    priceMax: "",
-    brand: "",
-    color: "",
-    shoeSize: "",
-    shoeStyle: "",
-    gender: "",
+    category: null,
+    priceMin: null,
+    priceMax: null,
+    brand: null,
+    color: null,
+    shoeSize: null,
+    shoeStyle: null,
+    gender: null,
   });
 
   // const [category, setCategory] = useState("");
@@ -72,14 +72,14 @@ export default function Filter({ onFilterChange }) {
     { value: "reebok", label: "Reebok" },
   ];
 
-  const colors = [
+  const color = [
     { value: "black", label: "Black" },
     { value: "white", label: "White" },
     { value: "red", label: "Red" },
     { value: "blue", label: "Blue" },
   ];
 
-  const shoeSizes = [
+  const shoeSize = [
     { value: "35", label: "EU 35" },
     { value: "40", label: "EU 40" },
     { value: "43", label: "EU 43" },
@@ -87,23 +87,23 @@ export default function Filter({ onFilterChange }) {
     // Add more shoe sizes as needed
   ];
 
-  const shoeStyles = [
+  const shoeStyle = [
     { value: "casual", label: "Casual" },
     { value: "athletic", label: "Athletic" },
     { value: "formal", label: "Formal" },
   ];
 
-  const genders = [
-    { value: "male", label: "Male" },
-    { value: "female", label: "Female" },
-    { value: "kid", label: "Kid" },
-    // Add more genders as needed
+  const gender = [
+    { value: "MALE", label: "Male" },
+    { value: "FEMALE", label: "Female" },
+    { value: "KIDS", label: "Kid" },
+    // Add more gender as needed
   ];
 
   const handleCategoryChange = (selectedCategory) => {
     setCriteria((prevCriteria) => ({
       ...prevCriteria,
-      category: selectedCategory,
+      category: selectedCategory === "" ? (null) : (selectedCategory),
     }));
   };
 
@@ -124,8 +124,8 @@ export default function Filter({ onFilterChange }) {
         priceMax = Infinity; // or a large number to represent 'above $100'
         break;
       default:
-        // Handle unexpected values
-        throw new Error("Invalid price range");
+        priceMin = null
+        priceMax = null
     }
 
     return { priceMin, priceMax };
@@ -144,35 +144,35 @@ export default function Filter({ onFilterChange }) {
   const handleBrandChange = (selectedBrand) => {
     setCriteria((prevCriteria) => ({
       ...prevCriteria,
-      brand: selectedBrand,
+      brand: selectedBrand === "" ? (null) : (selectedBrand),
     }));
   };
 
   const handleColorChange = (selectedColor) => {
     setCriteria((prevCriteria) => ({
       ...prevCriteria,
-      color: selectedColor,
+      color: selectedColor === "" ? (null) : (selectedColor),
     }));
   };
 
   const handleShoeSizeChange = (selectedShoeSize) => {
     setCriteria((prevCriteria) => ({
       ...prevCriteria,
-      shoeSize: selectedShoeSize,
+      shoeSize: selectedShoeSize === "" ? (null) : (selectedShoeSize),
     }));
   };
 
   const handleShoeStyleChange = (selectedShoeStyle) => {
     setCriteria((prevCriteria) => ({
       ...prevCriteria,
-      shoeStyle: selectedShoeStyle,
+      shoeStyle: selectedShoeStyle === "" ? (null) : (selectedShoeStyle),
     }));
   };
 
   const handleGenderChange = (selectedGender) => {
     setCriteria((prevCriteria) => ({
       ...prevCriteria,
-      gender: selectedGender,
+      gender: selectedGender === "" ? (null) : (selectedGender),
     }));
   };
 
@@ -205,25 +205,25 @@ export default function Filter({ onFilterChange }) {
         />
         <Select
           placeholder="Select a color"
-          options={colors}
+          options={color}
           value={criteria.color}
           onChange={(e) => handleColorChange(e.target.value)}
         />
         <Select
           placeholder="Select a size"
-          options={shoeSizes}
+          options={shoeSize}
           value={criteria.shoeSize}
           onChange={(e) => handleShoeSizeChange(e.target.value)}
         />
         <Select
           placeholder="Select a style"
-          options={shoeStyles}
+          options={shoeStyle}
           value={criteria.shoeStyle}
           onChange={(e) => handleShoeStyleChange(e.target.value)}
         />
         <Select
           placeholder="Select gender"
-          options={genders}
+          options={gender}
           value={criteria.gender}
           onChange={(e) => handleGenderChange(e.target.value)}
         />

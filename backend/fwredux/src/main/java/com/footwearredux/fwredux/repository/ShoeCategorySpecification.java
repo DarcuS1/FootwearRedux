@@ -21,31 +21,35 @@ public class ShoeCategorySpecification implements Specification<ShoeProduct> {
     public Predicate toPredicate(Root<ShoeProduct> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
-        if (shoeProduct.getCategory() != null) {
-            predicates.add(criteriaBuilder.equal(root.get("shoeCategory"), shoeProduct.getCategory()));
+        if (shoeProduct.getCategory() != null && !shoeProduct.getCategory().equals("")) {
+            predicates.add(criteriaBuilder.equal(root.get("shoeCategory").get("name"), shoeProduct.getCategory()));
         }
 
         if (shoeProduct.getPriceMin() != null) {
             predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("price"), shoeProduct.getPriceMin()));
         }
 
-        if (shoeProduct.getBrand() != null) {
-            predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("brand"), shoeProduct.getPriceMax()));
+        if (shoeProduct.getPriceMax() != null) {
+            predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), shoeProduct.getPriceMax()));
         }
 
-        if (shoeProduct.getColor() != null) {
+        if (shoeProduct.getBrand() != null && !shoeProduct.getBrand().equals("")) {
+            predicates.add(criteriaBuilder.equal(root.get("brand"), shoeProduct.getBrand()));
+        }
+
+        if (shoeProduct.getColor() != null && !shoeProduct.getColor().equals("")) {
             predicates.add(criteriaBuilder.equal(root.get("color"), shoeProduct.getColor()));
         }
 
-        if (shoeProduct.getShoeSize() != null) {
+        if (shoeProduct.getShoeSize() != null && !shoeProduct.getShoeSize().equals("")) {
             predicates.add(criteriaBuilder.equal(root.get("shoeSize"), shoeProduct.getShoeSize()));
         }
 
-        if (shoeProduct.getShoeStyle() != null) {
-            predicates.add(criteriaBuilder.equal(root.get("showStyle"), shoeProduct.getShoeStyle()));
+        if (shoeProduct.getShoeStyle() != null && !shoeProduct.getShoeStyle().equals("")) {
+            predicates.add(criteriaBuilder.equal(root.get("shoeStyle"), shoeProduct.getShoeStyle()));
         }
 
-        if (shoeProduct.getGender() != null) {
+        if (shoeProduct.getGender() != null && !shoeProduct.getGender().equals("")) {
             predicates.add(criteriaBuilder.equal(root.get("gender"), shoeProduct.getGender()));
         }
 

@@ -1,6 +1,7 @@
 package com.footwearredux.fwredux.config;
 
 import com.footwearredux.fwredux.jwt.JwtAuthentificationFilter;
+import com.footwearredux.fwredux.model.UserRole;
 import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +34,8 @@ public class SecurityConfig{
                 .authorizeHttpRequests( authorize -> authorize
                         .requestMatchers("/api/v1/auth/**", "/api/v1/shoes/fetch", "/api/v1/shoe_images/fetch/**")
                         .permitAll()
+                        .requestMatchers("/api/v1/admin/**")
+                        .hasAuthority(UserRole.ADMIN.name())
                         .anyRequest()
                         .authenticated()
                 )

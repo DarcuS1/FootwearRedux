@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class ShoeProductResponse {
     private String productUUID;
     private String shoeName;
-    private ShoeCategory shoeCategory;
+    private String shoeCategory;
     private Integer price;
     private String brand;
     private String color;
@@ -31,7 +31,7 @@ public class ShoeProductResponse {
     public ShoeProductResponse(ShoeProduct product) {
         this.productUUID = product.getUuid();
         this.shoeName = product.getShoeName();
-        this.shoeCategory = product.getShoeCategory();
+        this.shoeCategory = product.getShoeCategory().getName();
         this.price = product.getPrice();
         this.brand = product.getBrand();
         this.color = product.getColor();

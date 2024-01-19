@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class ShoeFilterCriteria {
     private Integer id;
 
-    private ShoeCategory category;
+    private String category;
     private Integer priceMin;
     private Integer priceMax;
     private String brand;
@@ -21,6 +21,7 @@ public class ShoeFilterCriteria {
     private Integer shoeSize;
     private String shoeStyle;
 
+    @Enumerated(value = EnumType.STRING)
     private GenderRole gender;
-    private Integer sellerId;
+    private String sellerUuid;
 }

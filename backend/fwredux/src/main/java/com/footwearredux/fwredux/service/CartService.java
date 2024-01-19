@@ -3,13 +3,13 @@ package com.footwearredux.fwredux.service;
 import com.footwearredux.fwredux.exception.CartShoeDuplicateException;
 import com.footwearredux.fwredux.exception.NotAvailableShoeList;
 import com.footwearredux.fwredux.exception.ShoeUUIDNotFound;
-import com.footwearredux.fwredux.model.Cart;
-import com.footwearredux.fwredux.model.ShoeProduct;
-import com.footwearredux.fwredux.model.ShoeState;
-import com.footwearredux.fwredux.model.User;
+import com.footwearredux.fwredux.model.*;
 import com.footwearredux.fwredux.repository.CartRepository;
+import com.footwearredux.fwredux.repository.OrderRepository;
 import com.footwearredux.fwredux.repository.ShoeProductRepository;
 import com.footwearredux.fwredux.repository.UserRepository;
+import com.footwearredux.fwredux.request.CartCheckoutRequest;
+import com.footwearredux.fwredux.response.OrderResponse;
 import com.footwearredux.fwredux.response.ShoeProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class CartService {
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
     private final ShoeProductRepository shoeProductRepository;
     private final ShoeProductService shoeProductService;
 
@@ -72,7 +73,7 @@ public class CartService {
     }
 
     @Transactional
-    public void checkoutCart(String email) {
+    public OrderResponse checkoutCart(String email, CartCheckoutRequest request) {
         Cart cart = cartRepository.findByUserEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
 
@@ -85,7 +86,24 @@ public class CartService {
 
         shoeProductService.makeShoeListSold(cart.getProducts());
 
+        List<ShoeProduct> productsForOrder = new ArrayList<>(cart.getProducts());
+        Order order = orderRepository.save(Order.builder()
+                .email(request.getEmail())
+                .address(request.getAddress())
+                .country(request.getCountry())
+                .city(request.getCity())
+                .fullName(request.getFullName())
+                .state(request.getState())
+                .postalCode(request.getPostalCode())
+                .phoneNumber(request.getPhoneNumber())
+                .products(productsForOrder)
+                .user(cart.getUser())
+                .build());
+
         cart.getProducts().clear();
         cartRepository.save(cart);
+
+
+        return new OrderResponse(order);
     }
 }

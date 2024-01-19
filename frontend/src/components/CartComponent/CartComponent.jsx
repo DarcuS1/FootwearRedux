@@ -1,53 +1,93 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom"; // Import useHistory
 import { useNavigate } from "react-router-dom";
-
-import { useCart } from "../CartContext/CartCOntext";
-
-// ... Rest of your code remains the same
+import { toast } from "react-toastify";
 
 export default function CartComponent() {
   const navigate = useNavigate();
+  const [cart, setCart] = useState([]);
+  const [updateCart, setUpdateCart] = useState(false)
+  const jwtToken = localStorage.getItem('jwtToken')
 
-  const { cart, removeFromCart } = useCart();
-  const [itemQuantities, setItemQuantities] = useState({});
+  useEffect(() => {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${jwtToken}`);
 
+
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+      body: null,
+      redirect: 'follow'
+    };
+
+
+    fetch('http://localhost:8080/api/v1/cart/fetch', requestOptions)
+      .then(response => {
+        if (!response.ok) {
+          console.log(`Add shoe to cart response not ok ${response}`)
+          throw new Exception(`Add shoe to cart response not ok`);
+        }
+        return response.json()
+      })
+      .then(response => {
+        return response
+      })
+      .then(data => {
+        setCart(data)
+      })
+      .catch(error => console.error(`Error fetching cart data: ${error}`));
+
+  }, [updateCart])
   // Calculate subtotal and shipping cost
+  console.log(`Cart list value: ${cart}`)
   const subtotal = cart.reduce(
-    (total, item) => total + item.price * (itemQuantities[item.id] || 1),
+    (total, item) => total + item.price,
     0
   );
   const shipping = 10; // You can change this value as needed
   const total = subtotal + shipping;
 
-  // Function to increase item quantity
-  const increaseQuantity = (itemId) => {
-    setItemQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [itemId]: (prevQuantities[itemId] || 1) + 1,
-    }));
-  };
+  const removeFromCart = (uuid) => {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${jwtToken}`);
 
-  // Function to decrease item quantity
-  const decreaseQuantity = (itemId) => {
-    setItemQuantities((prevQuantities) => {
-      const newQuantity = (prevQuantities[itemId] || 1) - 1;
-      const updatedQuantities = { ...prevQuantities };
-      if (newQuantity > 0) {
-        updatedQuantities[itemId] = newQuantity;
-      } else {
-        delete updatedQuantities[itemId];
-      }
-      return updatedQuantities;
+    var raw = JSON.stringify({
+      "shoeUUID": uuid
     });
-  };
+
+    var requestOptions = {
+      method: 'DELETE',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+
+    fetch('http://localhost:8080/api/v1/cart/removeshoe', requestOptions)
+      .then(response => {
+        if (!response.ok) {
+          console.log(`Add shoe to cart response not ok ${response}`)
+          throw new Exception(`Add shoe to cart response not ok`);
+        }
+        setUpdateCart(!updateCart)
+        toast.success("Successfully removed item", {
+          position: "top-center"
+        })
+      })
+      .catch((e) => {
+        toast.error(`Failed to remove item from cart`, {
+          position: "top-center"
+        })
+      })
+  }
 
   const goToCheckout = () => {
     const itemNames = cart.map((item) => item.name);
     const orderDetails = {
       itemNames: itemNames,
       cart,
-      itemQuantities,
       subtotal,
       shipping,
       total,
@@ -60,7 +100,7 @@ export default function CartComponent() {
       <h1 className="text-2xl font-bold">Your Cart</h1>
       <div className="grid gap-6 md:grid-cols-7">
         <div className="md:col-span-5">
-          {cart.map((item) => (
+          {cart.map((item, _) => (
             <div
               key={item.id}
               className="grid gap-4 md:grid-cols-[80px_1fr_100px_100px_80px] items-start"
@@ -70,7 +110,7 @@ export default function CartComponent() {
                 alt="Product Image"
                 className="rounded-md object-cover md:col-span-1"
                 height={80}
-                src={item.image}
+                src={`http://localhost:8080/api/v1/shoe_images/fetch/${item.coverImageUuid}`}
                 style={{
                   aspectRatio: "80/80",
                   objectFit: "cover",
@@ -78,40 +118,19 @@ export default function CartComponent() {
                 width={80}
               />
               <div className="md:col-span-1">
-                <h2 className="font-semibold">{item.name}</h2>
+                <h2 className="font-semibold">Name: {item.shoeName}</h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {item.description}
+                  Description: {item.description}
                 </p>
               </div>
               <div className="md:col-span-1">
                 <p className="font-semibold">${item.price}</p>
               </div>
               <div className="md:col-span-1">
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => decreaseQuantity(item.id)}
-                  >
-                    <MinusIcon className="ml-3 h-4 w-4" />
-                    <span className="sr-only">Decrease quantity</span>
-                  </Button>
-                  <span>{itemQuantities[item.id] || 1}</span>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => increaseQuantity(item.id)}
-                  >
-                    <PlusIcon className="ml-3 h-4 w-4" />
-                    <span className="sr-only">Increase quantity</span>
-                  </Button>
-                </div>
-              </div>
-              <div className="md:col-span-1">
                 <Button
                   size="icon"
                   variant="outline"
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => removeFromCart(item.productUUID)}
                 >
                   <TrashIcon className="ml-3 h-4 w-4" />
                   <span className="sr-only">Remove item</span>
