@@ -1,177 +1,323 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { useCart } from "../CartContext/CartContext";
+import React, { useState } from "react";
 
-// Define the Button component
-const Button = ({ size, variant, children, ...props }) => {
-  let sizeClasses = size === "icon" ? "h-10 w-10" : "py-2 px-4";
-  let variantClasses =
-    variant === "outline" ? "border border-gray-300" : "bg-blue-500 text-white";
+const UploadForm = () => {
+  const [productImage, setProductImage] = useState(null);
+  const [additionalImage1, setAdditionalImage1] = useState(null);
+  const [additionalImage2, setAdditionalImage2] = useState(null);
+  const [additionalImage3, setAdditionalImage3] = useState(null);
+  const [productName, setProductName] = useState("");
+  const [productDescription, setProductDescription] = useState("");
+  const [productPrice, setProductPrice] = useState("");
+  const [sellerName, setSellerName] = useState("");
+  const [sellerContact, setSellerContact] = useState("");
+
+  const jwtToken = localStorage.getItem('jwtToken')
+
+  const handleImageChange = (e, setImage) => {
+    const file = e.target.files[0];
+    setImage(file);
+  };
+
+  async function uploadShoeProduct(data) {
+    try {
+
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("Authorization", `Bearer ${jwtToken}`);
+
+      var raw = JSON.stringify({
+        "shoeName": "nike smecheri",
+        "category": "adsas",
+        "price": "123",
+        "brand": "dasdasd",
+        "color": "green",
+        "shoeSize": "12",
+        "shoeStyle": "nice",
+        "gender": "FEMALE",
+        "description": "Some big butty description"
+      });
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+      };
+
+      const response = await fetch("http://localhost:8080/api/v1/shoes/add", requestOptions)
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+
+      const result = await response.json();
+      return result.shoeUUID;
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  }
+
+  async function uploadCoverImage(shoeUuid, file) {
+    console.log(`uploadCoverImage: file: ${file}`);
+
+    try {
+      var myHeaders = new Headers();
+      myHeaders.append("Authorization", `Bearer ${jwtToken}`);
+
+      var formdata = new FormData();
+      formdata.append("file", file);
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+      };
+
+      const response = await fetch(`http://localhost:8080/api/v1/shoe_images/set_cover/${shoeUuid}`, requestOptions);
+      const responseText = await response.text();  // Or response.json() based on your API response
+      console.log(`SetCover response: ${responseText}`);
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      console.log('Cover image uploaded successfully');
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  }
+
+  async function uploadAdditionalImage(shoeUuid, file) {
+    console.log(`uploadAdditionalImage: file: ${file}`);
+
+    try {
+      var myHeaders = new Headers();
+      myHeaders.append("Authorization", `Bearer ${jwtToken}`);
+
+      var formdata = new FormData();
+      formdata.append("file", file);
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+      };
+
+      const response = await fetch(`http://localhost:8080/api/v1/shoe_images/add_image/${shoeUuid}`, requestOptions);
+      const responseText = await response.text();  // Or response.json() based on your API response
+      console.log(`SetAdditional response: ${responseText}`);
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      console.log('Additional images image uploaded successfully');
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  }
+
+
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = {
+      productName,
+      productDescription,
+      productPrice,
+      sellerName,
+      sellerContact,
+      productImage,
+      additionalImage1,
+      additionalImage2,
+      additionalImage3
+    };
+    console.log("Form Data:", formData);
+
+    // Example usage
+    const shoeData = {
+      shoeName: "nike smecheri",
+      categor: "adsas",
+      price: "123",
+      brand: "dasdasd",
+      color: "green",
+      shoeSize: "12",
+      shoeStyle: "nice",
+      gender: "FEMALE",
+      description: "some description"
+    }
+
+    console.log(shoeData)
+    console.log(`Auth token: ${jwtToken}`)
+
+    uploadShoeProduct(shoeData).then(shoeUuid => {
+      if (shoeUuid) {
+        // Upload the cover image
+        // Assuming 'coverImageFile' is the file you want to upload
+        uploadCoverImage(shoeUuid, productImage);
+
+        // Upload additional images
+        // Assuming 'additionalImageFiles' is an array of files
+        uploadAdditionalImage(shoeUuid, additionalImage1);
+        uploadAdditionalImage(shoeUuid, additionalImage2);
+        uploadAdditionalImage(shoeUuid, additionalImage3);
+      }
+    });
+
+
+  };
 
   return (
-    <button
-      className={`rounded-md ${sizeClasses} ${variantClasses}`}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
-
-// Define the Card components
-const Card = ({ children }) => (
-  <div className="bg-white shadow rounded-lg">{children}</div>
-);
-const CardHeader = ({ children }) => (
-  <div className="border-b p-4">{children}</div>
-);
-const CardContent = ({ children, className }) => (
-  <div className={`p-4 ${className}`}>{children}</div>
-);
-const CardFooter = ({ children }) => (
-  <div className="border-t p-4">{children}</div>
-);
-const CardTitle = ({ children }) => (
-  <h2 className="text-lg font-semibold">{children}</h2>
-);
-
-// Define the Separator component
-const Separator = () => <hr className="my-4" />;
-
-export default function CartComponent() {
-  const { cart, removeFromCart } = useCart();
-
-  // Calculate subtotal and shipping cost
-  const subtotal = cart.reduce((total, item) => total + item.price, 0);
-  const shipping = 10; // You can change this value as needed
-  const total = subtotal + shipping;
-
-  return (
-    <div className="flex flex-col gap-6 px-4 py-6 md:px-6 md:py-8 lg:px-12 lg:py-12">
-      <h1 className="text-2xl font-bold">Your Cart</h1>
-      <div className="grid gap-6 md:grid-cols-7">
-        <div className="md:col-span-5">
-          {cart.map((item) => (
-            <div
-              key={item.id}
-              className="grid gap-4 md:grid-cols-[80px_1fr_100px_100px_80px] items-start"
-            >
-              {/* Product details */}
-              <img
-                alt="Product Image"
-                className="rounded-md object-cover md:col-span-1"
-                height={80}
-                src={item.image}
-                style={{
-                  aspectRatio: "80/80",
-                  objectFit: "cover",
-                }}
-                width={80}
-              />
-              <div className="md:col-span-1">
-                <h2 className="font-semibold">{item.name}</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {item.description}
-                </p>
-              </div>
-              <div className="md:col-span-1">
-                <p className="font-semibold">${item.price}</p>
-              </div>
-              <div className="md:col-span-1">
-                <div className="flex items-center gap-2">
-                  <Button size="icon" variant="outline">
-                    <MinusIcon className="ml-3 h-4 w-4" />
-                    <span className="sr-only">Decrease quantity</span>
-                  </Button>
-                  <span>1</span>
-                  <Button size="icon" variant="outline">
-                    <PlusIcon className="ml-3 h-4 w-4" />
-                    <span className="sr-only">Increase quantity</span>
-                  </Button>
-                </div>
-              </div>
-              <div className="md:col-span-1">
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={() => removeFromCart(item.id)} // Remove item from cart
-                >
-                  <TrashIcon className="ml-3 h-4 w-4" />
-                  <span className="sr-only">Remove item</span>
-                </Button>
-              </div>
-            </div>
-          ))}
+    <div className="container max-w-lg px-4 py-5 mx-auto mt-px md:max-w-none md:text-center">
+      <h2 className="text-3xl font-bold text-center mb-6">Upload Your Product</h2>
+      <div className="grid lg:grid-cols-3 gap-8 items-start">
+        <div className="flex flex-col space-y-4 justify-center items-center lg:order-last">
+          <img
+            src={productImage}
+            width="200"
+            height="200"
+            alt="Uploaded Product Image"
+            className="rounded-xl"
+            style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
+          />
+          <img
+            src={additionalImage1 || 'https://via.placeholder.com/200'}
+            width="200"
+            height="200"
+            alt="Additional Image 1"
+            className="rounded-xl"
+            style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
+          />
+          <img
+            src={additionalImage2 || 'https://via.placeholder.com/200'}
+            width="200"
+            height="200"
+            alt="Additional Image 2"
+            className="rounded-xl"
+            style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
+          />
+          <img
+            src={additionalImage3 || 'https://via.placeholder.com/200'}
+            width="200"
+            height="200"
+            alt="Additional Image 3"
+            className="rounded-xl"
+            style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
+          />
         </div>
-        <div className="md:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Order Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="flex items-center">
-                <div>Subtotal</div>
-                <div className="ml-auto">${subtotal.toFixed(2)}</div>
-              </div>
-              <div className="flex items-center">
-                <div>Shipping</div>
-                <div className="ml-auto">${shipping.toFixed(2)}</div>
-              </div>
-              <Separator />
-              <div className="flex items-center font-medium">
-                <div>Total</div>
-                <div className="ml-auto">${total.toFixed(2)}</div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex items-center gap-2">
-              <Link to="/checkout">
-                <Button size="lg">Proceed to Checkout</Button>
-              </Link>
-            </CardFooter>
-          </Card>
+        <div className="space-y-6 lg:col-span-2">
+          <form onSubmit={handleSubmit}>
+            <label
+              className="block text-lg font-medium mb-2"
+              htmlFor="product-name"
+            >
+              Product Name
+            </label>
+            <input
+              id="product-name"
+              className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="text"
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+            />
+
+            <label
+              className="block text-lg font-medium mt-4 mb-2"
+              htmlFor="product-description"
+            >
+              Product Description
+            </label>
+            <textarea
+              id="product-description"
+              rows="4"
+              className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={productDescription}
+              onChange={(e) => setProductDescription(e.target.value)}
+            ></textarea>
+
+            <label
+              className="block text-lg font-medium mt-4 mb-2"
+              htmlFor="product-price"
+            >
+              Product Price
+            </label>
+            <input
+              id="product-price"
+              className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="number"
+              value={productPrice}
+              onChange={(e) => setProductPrice(e.target.value)}
+            />
+
+            <label
+              className="block text-lg font-medium mt-4 mb-2"
+              htmlFor="product-image"
+            >
+              Product Image (This image will be displayed on the right)
+            </label>
+            <input
+              id="product-image"
+              className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="file"
+              onChange={(e) => handleImageChange(e, setProductImage)}
+            />
+            <input
+              type="file"
+              onChange={(e) => handleImageChange(e, setAdditionalImage1)}
+            />
+            <input
+              type="file"
+              onChange={(e) => handleImageChange(e, setAdditionalImage2)}
+            />
+            <input
+              type="file"
+              onChange={(e) => handleImageChange(e, setAdditionalImage3)}
+            />
+            <div className="space-y-6 mt-6">
+              <div className="text-lg font-bold mb-4">Seller Information</div>
+              <label
+                className="block text-lg font-medium mb-2"
+                htmlFor="seller-name"
+              >
+                Seller Name
+              </label>
+              <input
+                id="seller-name"
+                className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                type="text"
+                value={sellerName}
+                onChange={(e) => setSellerName(e.target.value)}
+              />
+
+              <label
+                className="block text-lg font-medium mt-4 mb-2"
+                htmlFor="seller-contact"
+              >
+                Seller Contact
+              </label>
+              <input
+                id="seller-contact"
+                className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                type="text"
+                value={sellerContact}
+                onChange={(e) => setSellerContact(e.target.value)}
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full md:w-auto bg-blue-500 rounded border-black border-5 text-white mt-6"
+            >
+              Upload
+            </button>
+          </form>
         </div>
       </div>
     </div>
   );
-}
+};
 
-function PlusIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M5 12h14" />
-      <path d="M12 5v14" />
-    </svg>
-  );
-}
-
-function TrashIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 6h18" />
-      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-    </svg>
-  );
-}
+export default UploadForm;

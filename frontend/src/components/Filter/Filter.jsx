@@ -80,10 +80,11 @@ export default function Filter({ onFilterChange }) {
   ];
 
   const shoeSizes = [
-    { value: "us_6", label: "US 6" },
-    { value: "us_7", label: "US 7" },
-    { value: "us_8", label: "US 8" },
-    { value: "us_9", label: "US 9" },
+    { value: "35", label: "EU 35" },
+    { value: "40", label: "EU 40" },
+    { value: "43", label: "EU 43" },
+    { value: "45", label: "EU 45" },
+    // Add more shoe sizes as needed
   ];
 
   const shoeStyles = [
@@ -95,7 +96,8 @@ export default function Filter({ onFilterChange }) {
   const genders = [
     { value: "male", label: "Male" },
     { value: "female", label: "Female" },
-    { value: "unisex", label: "Unisex" },
+    { value: "kid", label: "Kid" },
+    // Add more genders as needed
   ];
 
   const handleCategoryChange = (selectedCategory) => {
@@ -109,34 +111,34 @@ export default function Filter({ onFilterChange }) {
     let priceMin, priceMax;
 
     switch (selectedPriceRange) {
-        case "under_50":
-            priceMin = 0;
-            priceMax = 50;
-            break;
-        case "50_to_100":
-            priceMin = 50;
-            priceMax = 100;
-            break;
-        case "above_100":
-            priceMin = 100;
-            priceMax = Infinity; // or a large number to represent 'above $100'
-            break;
-        default:
-            // Handle unexpected values
-            throw new Error("Invalid price range");
+      case "under_50":
+        priceMin = 0;
+        priceMax = 50;
+        break;
+      case "50_to_100":
+        priceMin = 50;
+        priceMax = 100;
+        break;
+      case "above_100":
+        priceMin = 100;
+        priceMax = Infinity; // or a large number to represent 'above $100'
+        break;
+      default:
+        // Handle unexpected values
+        throw new Error("Invalid price range");
     }
 
     return { priceMin, priceMax };
-}
+  }
 
   const handlePriceRangeChange = (selectedPriceRange) => {
     const { priceMin, priceMax } = mapPriceRange(selectedPriceRange);
     setCriteria((prevCriteria) => (
       {
-      ...prevCriteria,
-      priceMin: priceMin,
-      priceMax: priceMax
-    }));
+        ...prevCriteria,
+        priceMin: priceMin,
+        priceMax: priceMax
+      }));
   };
 
   const handleBrandChange = (selectedBrand) => {

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Define the Select component
 const Select = ({ placeholder, options, value, onChange }) => {
@@ -62,10 +64,10 @@ const UploadForm = () => {
   ];
 
   const shoeSizes = [
-    { value: "us_6", label: "US 6" },
-    { value: "us_7", label: "US 7" },
-    { value: "us_8", label: "US 8" },
-    { value: "us_9", label: "US 9" },
+    { value: "35", label: "EU 35" },
+    { value: "40", label: "EU 40" },
+    { value: "43", label: "EU 43" },
+    { value: "45", label: "EU 45" },
     // Add more shoe sizes as needed
   ];
 
@@ -79,21 +81,145 @@ const UploadForm = () => {
   const genders = [
     { value: "male", label: "Male" },
     { value: "female", label: "Female" },
-    { value: "unisex", label: "Unisex" },
+    { value: "kid", label: "Kid" },
     // Add more genders as needed
   ];
+
+  async function uploadShoeProduct(data) {
+    try {
+
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("Authorization", `Bearer ${jwtToken}`);
+
+      var raw = JSON.stringify(data);
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+      };
+
+      const response = await fetch("http://localhost:8080/api/v1/shoes/add", requestOptions)
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+      return result.shoeUUID;
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  }
+
+  const jwtToken = localStorage.getItem('jwtToken')
+
+  async function uploadCoverImage(shoeUuid, file) {
+    console.log(`uploadCoverImage: file: ${file}`);
+
+    try {
+      var myHeaders = new Headers();
+      myHeaders.append("Authorization", `Bearer ${jwtToken}`);
+
+      var formdata = new FormData();
+      formdata.append("file", file);
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+      };
+
+      const response = await fetch(`http://localhost:8080/api/v1/shoe_images/set_cover/${shoeUuid}`, requestOptions);
+      const responseText = await response.text();  // Or response.json() based on your API response
+      console.log(`SetCover response: ${responseText}`);
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      console.log('Cover image uploaded successfully');
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  }
+
+  async function uploadAdditionalImage(shoeUuid, file) {
+    console.log(`uploadAdditionalImage: file: ${file}`);
+
+    try {
+      var myHeaders = new Headers();
+      myHeaders.append("Authorization", `Bearer ${jwtToken}`);
+
+      var formdata = new FormData();
+      formdata.append("file", file);
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+      };
+
+      const response = await fetch(`http://localhost:8080/api/v1/shoe_images/add_image/${shoeUuid}`, requestOptions);
+      const responseText = await response.text();  // Or response.json() based on your API response
+      console.log(`SetAdditional response: ${responseText}`);
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      console.log('Additional images image uploaded successfully');
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  }
 
   // Image change handler
   const handleImageChange = (e, setImage) => {
     const file = e.target.files[0];
     const imageUrl = URL.createObjectURL(file);
-    setImage(imageUrl);
+
+    // Create an image element
+    const img = new Image();
+
+    img.onload = () => {
+      // Create a canvas
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      // Set canvas dimensions
+      canvas.width = 300;
+      canvas.height = 300;
+
+      // Draw the image onto the canvas
+      ctx.drawImage(img, 0, 0, 300, 300);
+
+      // Convert the canvas to a data URL
+      canvas.toBlob(blob => {
+        const resizedFile = new File([blob], file.name, {
+          type: 'image/jpeg',
+          lastModified: Date.now()
+        });
+
+        const resizedImageUrl = URL.createObjectURL(resizedFile);
+
+        // Set the resized image
+        setImage({ url: resizedImageUrl, file: resizedFile });
+      }, 'image/jpeg');
+    };
+
+    // Set the source of the image to the original file's URL
+    img.src = imageUrl;
   };
 
   // Form submission handler
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formData = {
+
+    const shoeData = {
       shoeName,
       category,
       price,
@@ -102,14 +228,43 @@ const UploadForm = () => {
       shoeSize,
       shoeStyle,
       description,
-      gender,
-      coverImage,
-      secondImage,
-      thirdImage,
-      fourthImage,
+      gender: gender.toUpperCase()
     };
-    console.log("Form Data:", formData);
-    // Typically, you'd send formData to your server here
+    console.log("Form Data:", shoeData);
+
+    if (shoeName == "" ||
+      category == "" ||
+      price == "" ||
+      brand == "" ||
+      color == "" ||
+      shoeSize == "" ||
+      shoeStyle == "" ||
+      description == "" ||
+      gender == "" ||
+      coverImage == null ||
+      secondImage == null ||
+      thirdImage == null ||
+      fourthImage == null) {
+      toast.error("Please fill out all form fields", {
+        position: "top-center"
+      });
+      return;
+    }
+
+    uploadShoeProduct(shoeData).then(shoeUuid => {
+      if (shoeUuid) {
+        // Upload the cover image
+        // Assuming 'coverImageFile' is the file you want to upload
+        uploadCoverImage(shoeUuid, coverImage.file);
+
+        // Upload additional images
+        // Assuming 'additionalImageFiles' is an array of files
+        uploadAdditionalImage(shoeUuid, secondImage.file);
+        uploadAdditionalImage(shoeUuid, thirdImage.file);
+        uploadAdditionalImage(shoeUuid, fourthImage.file);
+      }
+    });
+
   };
 
   return (
@@ -135,7 +290,13 @@ const UploadForm = () => {
           type="number"
           placeholder="Price"
           value={price}
-          onChange={(e) => setPrice(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value <= 0) {
+              e.stopPropagation()
+              return
+            }
+            setPrice(e.target.value)
+          }}
           className="block w-full px-4 py-2 border border-gray-300 rounded-md"
         />
         <Select
@@ -203,25 +364,25 @@ const UploadForm = () => {
       <div className="w-full md:w-1/2 md:ml-8 space-y-4">
         {coverImage && (
           <div className="max-w-xs rounded-md overflow-hidden">
-            <img src={coverImage} alt="Cover" className="w-full" />
+            <img src={coverImage.url} alt="Cover" className="w-full" />
             <p className="text-center">Cover Image</p>
           </div>
         )}
         {secondImage && (
           <div className="max-w-xs rounded-md overflow-hidden">
-            <img src={secondImage} alt="Second" className="w-full" />
+            <img src={secondImage.url} alt="Second" className="w-full" />
             <p className="text-center">Second Image</p>
           </div>
         )}
         {thirdImage && (
           <div className="max-w-xs rounded-md overflow-hidden">
-            <img src={thirdImage} alt="Third" className="w-full" />
+            <img src={thirdImage.url} alt="Third" className="w-full" />
             <p className="text-center">Third Image</p>
           </div>
         )}
         {fourthImage && (
           <div className="max-w-xs rounded-md overflow-hidden">
-            <img src={fourthImage} alt="Fourth" className="w-full" />
+            <img src={fourthImage.url} alt="Fourth" className="w-full" />
             <p className="text-center">Fourth Image</p>
           </div>
         )}

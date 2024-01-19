@@ -21,6 +21,8 @@ import ProductComponent from "./components/ProductComponent/ProductComponent";
 import UserInfo from "./components/UserInfo/UserInfo";
 import ShopComponent from "./components/ShopComponent/ShopComponent";
 import { CartContextProvider } from "./components/CartContext/CartCOntext";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const Home = () => (
   <div>
@@ -116,6 +118,7 @@ const UserPage = () => (
 const App = () => {
   return (
     <CartContextProvider>
+      <ToastContainer />
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />

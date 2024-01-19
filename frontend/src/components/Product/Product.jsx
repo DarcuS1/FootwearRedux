@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useCart } from "../CartContext/CartCOntext";
+import { toast } from "react-toastify";
 
 const Product = ({ criteria }) => {
   const [products, setProducts] = useState([]);
+  const jwtToken = localStorage.getItem('jwtToken')
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -13,19 +15,20 @@ const Product = ({ criteria }) => {
         };
         console.log(requestBody);
 
-        const response = await fetch("/api/v1/shoes/fetch", {
-          method: "GET",
+        const response = await fetch("http://localhost:8080/api/v1/shoes/fetch", {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(requestBody),
+          redirect: 'follow'
         });
 
         if (!response.ok) {
           throw new Error("Failed to fetch shoe products");
         }
 
-        const data = await response.json();
+        const data = (await response.json()).filter((v, _) => { return v.coverImageUuid !== "" });
         setProducts(data);
       } catch (error) {
         console.error("Error fetching shoe products:", error);
@@ -49,7 +52,7 @@ const Product = ({ criteria }) => {
       {products.map((product) => (
         <div key={product.id} className="rounded-lg overflow-hidden shadow-lg">
           <img
-            src={product.image}
+            src={`http://localhost:8080/api/v1/shoe_images/fetch/${product.coverImageUuid}`}
             height="300"
             width="300"
             alt="Product Image"
@@ -60,7 +63,7 @@ const Product = ({ criteria }) => {
             <p className="text-gray-700">{product.description}</p>
             <p className="text-red-500 font-bold">${product.price}</p>
             <button
-              onClick={handleAddToCart(product)}
+              onClick={() => handleAddToCart(product)}
               className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 mt-4"
             >
               Add to Cart

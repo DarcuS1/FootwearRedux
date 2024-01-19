@@ -29,7 +29,7 @@ import java.util.List;
 public class ShoeProductController {
     private final ShoeProductService shoeProductService;
 
-    @GetMapping("fetch")
+    @PostMapping("fetch")
     private ResponseEntity<List<ShoeProductResponse>> fetchShoes(
             @Valid @RequestBody ShoeProductFetchRequest Request
     ) {
