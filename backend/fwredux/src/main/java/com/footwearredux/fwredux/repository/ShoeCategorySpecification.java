@@ -21,16 +21,16 @@ public class ShoeCategorySpecification implements Specification<ShoeProduct> {
     public Predicate toPredicate(Root<ShoeProduct> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
-        if (shoeProduct.getShoeCategory() != null) {
-            predicates.add(criteriaBuilder.equal(root.get("shoeCategory"), shoeProduct.getShoeCategory()));
+        if (shoeProduct.getCategory() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("shoeCategory"), shoeProduct.getCategory()));
         }
 
-        if (shoeProduct.getPrice() != null) {
-            predicates.add(criteriaBuilder.equal(root.get("price"), shoeProduct.getPrice()));
+        if (shoeProduct.getPriceMin() != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("price"), shoeProduct.getPriceMin()));
         }
 
         if (shoeProduct.getBrand() != null) {
-            predicates.add(criteriaBuilder.equal(root.get("brand"), shoeProduct.getBrand()));
+            predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("brand"), shoeProduct.getPriceMax()));
         }
 
         if (shoeProduct.getColor() != null) {

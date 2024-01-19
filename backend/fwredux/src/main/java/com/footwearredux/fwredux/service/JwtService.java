@@ -21,7 +21,7 @@ public class JwtService {
     private final byte[] SECRET_KEY_BYTES = Base64.getDecoder().decode(SECRET_KEY);
     private final SecretKey secretKey = new SecretKeySpec(SECRET_KEY_BYTES, "HmacSHA256");
 
-    private static final int TOKEN_VALID_TIME_MS = 1000 * 60 * 24;
+    private static final int TOKEN_VALID_TIME_MS = 1000 * 60 * 60 * 24;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

@@ -26,11 +26,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/shoes")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
 public class ShoeProductController {
     private final ShoeProductService shoeProductService;
 
-    @GetMapping("fetch")
+    @PostMapping("fetch")
     private ResponseEntity<List<ShoeProductResponse>> fetchShoes(
             @Valid @RequestBody ShoeProductFetchRequest Request
     ) {
@@ -60,5 +59,14 @@ public class ShoeProductController {
         return ResponseEntity.ok(ShoeProductAddedResponse.builder()
                 .shoeUUID(product.getUuid())
                 .build());
+    }
+
+    @DeleteMapping("remove/{uuid}")
+    private ResponseEntity<Void> removeShoe(@PathVariable String uuid) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        shoeProductService.removeShoe(authentication.getName(), uuid);
+
+        return ResponseEntity.ok().build();
     }
 }

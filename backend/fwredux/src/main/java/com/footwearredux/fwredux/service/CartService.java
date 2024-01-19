@@ -27,6 +27,7 @@ public class CartService {
     private final ShoeProductRepository shoeProductRepository;
     private final ShoeProductService shoeProductService;
 
+    @Transactional
     public List<ShoeProductResponse> getAllShoesInCart(String email) {
         Cart cart = cartRepository.findByUserEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));

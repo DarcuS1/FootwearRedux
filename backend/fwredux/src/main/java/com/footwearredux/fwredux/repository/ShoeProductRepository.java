@@ -11,4 +11,6 @@ import java.util.Optional;
 
 public interface ShoeProductRepository extends JpaRepository<ShoeProduct, Integer>, JpaSpecificationExecutor<ShoeProduct> {
     Optional<ShoeProduct> findByUuidAndShoeState(String uuid, ShoeState state);
+    Optional<ShoeProduct> findByUuid(String uuid);
+    void deleteByUuid(String uuid);
 }

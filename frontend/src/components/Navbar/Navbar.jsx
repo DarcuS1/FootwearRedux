@@ -6,6 +6,9 @@ const Navbar = () => {
   const [currentPage, setCurrentPage] = useState("home");
   const [showSearch, setShowSearch] = useState(false);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Modify this based on your authentication logic
+  const [username, setUsername] = useState("User");
+
   const handleNavLinkClick = (page) => {
     setCurrentPage(page);
     setShowSearch(false);
@@ -107,20 +110,28 @@ const Navbar = () => {
             </div>
 
             <div className="flex flex-col items-start justify-end w-full pt-4 md:items-center md:w-1/3 md:flex-row md:py-0">
-              <Link
-                to="/sign-in"
-                className="w-full px-3 py-2 mr-0 ml-6 text-gray-700 md:mr-2 lg:mr-3 md:w-auto"
-                onClick={() => handleNavLinkClick("sign-in")}
-              >
-                Sign In
-              </Link>
-              <Link
-                to="/sign-up"
-                className="inline-flex items-end ml-6 w-full px-6 py-3 text-sm font-medium leading-4 text-white bg-indigo-600 md:px-3 md:w-auto md:rounded-full lg:px-5 hover:bg-indigo-500 focus:outline-none md:focus:ring-2 focus:ring-0 focus:ring-offset-2 focus:ring-indigo-600"
-                onClick={() => handleNavLinkClick("sign-up")}
-              >
-                Sign Up
-              </Link>
+              {isLoggedIn ? (
+                <div className="ml-6 text-gray-700 md:mr-2 lg:mr-3 md:w-auto">
+                  Hi, {username}
+                </div>
+              ) : (
+                <>
+                  <Link
+                    to="/sign-in"
+                    className="w-full px-3 py-2 mr-0 ml-6 text-gray-700 md:mr-2 lg:mr-3 md:w-auto"
+                    onClick={() => handleNavLinkClick("sign-in")}
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/sign-up"
+                    className="inline-flex items-end ml-6 w-full px-6 py-3 text-sm font-medium leading-4 text-white bg-indigo-600 md:px-3 md:w-auto md:rounded-full lg:px-5 hover:bg-indigo-500 focus:outline-none md:focus:ring-2 focus:ring-0 focus:ring-offset-2 focus:ring-indigo-600"
+                    onClick={() => handleNavLinkClick("sign-up")}
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
             {/* Cart Icon */}
             <Link to="/cart" className="ml-5">

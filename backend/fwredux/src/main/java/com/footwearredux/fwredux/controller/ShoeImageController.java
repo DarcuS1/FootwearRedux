@@ -20,7 +20,6 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/v1/shoe_images")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
 public class ShoeImageController {
 
     private final ShoeImageService shoeImageService;
@@ -94,9 +93,9 @@ public class ShoeImageController {
         }
     }
 
-    @PostMapping("add_image")
+    @PostMapping("add_image/{uuid}")
     private ResponseEntity<String> addImageToShoe(
-            @Valid @RequestBody ShoeImagesAddRequest request,
+            @Valid @PathVariable String uuid,
             @NotNull @RequestParam("file") MultipartFile file) {
 
         // Check if the file is empty
@@ -119,7 +118,7 @@ public class ShoeImageController {
             byte[] imageBytes = file.getBytes();
 
             // Call the service method to add the image to the product cover
-            shoeImageService.addImageToProductList(username, request.getShoeUuid(), imageBytes);
+            shoeImageService.addImageToProductList(username, uuid, imageBytes);
 
             return ResponseEntity.ok().build();
         } catch (IOException e) {

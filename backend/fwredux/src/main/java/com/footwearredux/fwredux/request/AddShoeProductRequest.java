@@ -36,6 +36,9 @@ public class AddShoeProductRequest {
     private String shoeStyle;
 
     @NotNull
+    private String description;
+
+    @NotNull
     @Enumerated(value = EnumType.STRING)
     private GenderRole gender;
 }

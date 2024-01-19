@@ -26,6 +26,7 @@ public class ShoeProductResponse {
     private GenderRole gender;
     private String coverImageUuid;
     private String sellerUUID;
+    private String description;
 
     public ShoeProductResponse(ShoeProduct product) {
         this.productUUID = product.getUuid();
@@ -43,5 +44,6 @@ public class ShoeProductResponse {
             this.coverImageUuid = "";
         }
         this.sellerUUID = product.getSeller().getUuid();
+        this.description = product.getDescription();
     }
 }
