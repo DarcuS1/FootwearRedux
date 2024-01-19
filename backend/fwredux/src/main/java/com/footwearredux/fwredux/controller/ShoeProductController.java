@@ -61,6 +61,12 @@ public class ShoeProductController {
                 .build());
     }
 
+    @GetMapping("/get_product/{uuid}")
+    private ResponseEntity<ShoeProductResponse> getSingelShoe(
+            @Valid @PathVariable  String uuid) {
+        return ResponseEntity.ok(shoeProductService.getSingelShoe(uuid));
+    }
+
     @DeleteMapping("remove/{uuid}")
     private ResponseEntity<Void> removeShoe(@PathVariable String uuid) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -1,6 +1,7 @@
 package com.footwearredux.fwredux.service;
 
 import com.footwearredux.fwredux.exception.InvalidShoeStateTransition;
+import com.footwearredux.fwredux.exception.ShoeUUIDNotFound;
 import com.footwearredux.fwredux.model.*;
 import com.footwearredux.fwredux.repository.ShoeCategoryRepository;
 import com.footwearredux.fwredux.repository.ShoeCategorySpecification;
@@ -27,6 +28,7 @@ public class ShoeProductService {
     private final ShoeCategoryRepository shoeCategoryRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public List<ShoeProductResponse> fetchShoes(int PageIndex, ShoeFilterCriteria Criteria) {
         final int pageSize = 100;
         PageRequest pageRequest = PageRequest.of(PageIndex, pageSize);
@@ -44,6 +46,14 @@ public class ShoeProductService {
         return shoeResponse;
     }
 
+    @Transactional
+    public ShoeProductResponse getSingelShoe(String uuid) {
+        ShoeProduct shoeProduct = shoeProductRepository.findByUuidAndShoeState(uuid, ShoeState.AVALIABLE).
+                orElseThrow(() -> new ShoeUUIDNotFound(uuid));
+        return new ShoeProductResponse(shoeProduct);
+    }
+
+    @Transactional
     public ShoeProduct addShoe(String email, AddShoeProductRequest Request) {
         Optional<User> optUser  = userRepository.findUserByEmail(email);
         if (!optUser.isPresent()) {
@@ -73,6 +83,7 @@ public class ShoeProductService {
         return shoeProductRepository.save(shoe);
     }
 
+    @Transactional
     public void removeShoe(String userEmail, String uuid) {
         ShoeProduct product = shoeProductRepository.findByUuid(uuid).orElseThrow(() -> new UsernameNotFoundException(userEmail));
 

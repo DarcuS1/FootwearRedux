@@ -14,27 +14,27 @@ const Product = ({ criteria }) => {
           pageIndex: 0,
           criteria: criteria,
         };
-        console.log(requestBody);
 
-        const response = await fetch(
-          "http://localhost:8080/api/v1/shoes/fetch",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(requestBody),
-            redirect: "follow",
-          }
-        );
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        var raw = JSON.stringify(requestBody);
+
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: raw,
+          redirect: 'follow'
+        };
+
+        const response = await fetch("http://localhost:8080/api/v1/shoes/fetch", requestOptions);
 
         if (!response.ok) {
           throw new Error("Failed to fetch shoe products");
         }
 
-        const data = (await response.json()).filter((v, _) => {
-          return v.coverImageUuid !== "";
-        });
+        const data = await response.json();
+        console.log(data);
         setProducts(data);
       } catch (error) {
         console.error("Error fetching shoe products:", error);

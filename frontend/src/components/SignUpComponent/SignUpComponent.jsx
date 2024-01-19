@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const SignUpComponent = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [profileImage, setProfileImage] = useState(null);
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Submit logic goes here
     console.log({ firstName, lastName, email, password });
@@ -21,34 +23,75 @@ const SignUpComponent = () => {
       lastName: lastName,
     };
 
-
-    fetch(url, {
-      method: "POST", // HTTP method
-      headers: {
-        "Content-Type": "application/json", // Set the content type to JSON
-      },
-      body: JSON.stringify(data), // Convert data to JSON format
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json(); // Parse the response JSON
-      })
-      .then((responseData) => {
-        // Handle the response data here
-        console.log("Register response Data:", responseData);
-        if (responseData.error !== null) {
-          throw new Error(`Register error: ${responseData.error}`)
-        } else {
-          navigate('/sign-in')
-        }
-
-      })
-      .catch((error) => {
-        // Handle any errors that occurred during the fetch
-        console.error("Fetch Error:", error);
+    try {
+      // Fetch for registration
+      const registrationResponse = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+        redirect: "follow"
       });
+
+      if (!registrationResponse.ok) {
+        throw new Error(`HTTP error! Status: ${registrationResponse.status}`)
+      }
+
+      const registrationData = await registrationResponse.json();
+      console.log(registrationData);
+
+      if (registrationData.error) {
+        console.log("Registration failed error: " + registrationData.error);
+        throw new Error("Failed to register");
+      }
+
+      const token = registrationData.token;
+      console.log(`Received token: ${token}`);
+
+      // FormData for image upload
+      const formData = new FormData();
+      formData.append('file', profileImage);
+
+      // Headers for image upload
+      var myHeaders = new Headers();
+      myHeaders.append("Authorization", `Bearer ${token}`);
+
+      // Fetch for image upload
+      const imageUploadResponse = await fetch("http://localhost:8080/api/v1/user/set_image", {
+        method: "POST",
+        headers: myHeaders,
+        body: formData,
+        redirect: "follow"
+      });
+
+      if (!imageUploadResponse.ok) {
+        throw new Error(`Image upload failed. HTTP error! Status: ${imageUploadResponse.status}`);
+      }
+
+      const userDetails = await imageUploadResponse.json();
+      console.log(userDetails);
+
+      toast.success("User registered with success");
+      navigate('/sign-in')
+    } catch (ex) {
+      console.error(ex);
+      toast.error("User registration failed", {
+        position: "top-center"
+      });
+    }
+
+
+
+  }
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImage(file);
+    } else {
+      setProfileImage(null);
+    }
   };
 
   return (
@@ -58,7 +101,6 @@ const SignUpComponent = () => {
           <div className="relative w-full bg-cover lg:w-6/12 xl:w-7/12 bg-gradient-to-r from-white via-white to-gray-100">
             <div
               className="relative flex flex-col items-center justify-center w-full h-full px-10 my-20 lg:px-16 lg:my-0 tails-selected-element"
-              contenteditable="false"
             >
               <div className="flex flex-col items-start space-y-8 tracking-tight lg:max-w-3xl">
                 <div className="relative">
@@ -137,6 +179,22 @@ const SignUpComponent = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
+                </div>
+                <div className="relative">
+                  <label className="font-medium text-gray-900">Profile Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="block w-full px-4 py-4 mt-2 text-xl placeholder-gray-400 bg-gray-200 rounded-lg focus:outline-none"
+                    onChange={handleImageChange}
+                  />
+                  {profileImage && (
+                    <img
+                      src={URL.createObjectURL(profileImage)}
+                      alt="Profile Preview"
+                      className="mt-4 w-20 h-20 object-cover rounded-full"
+                    />
+                  )}
                 </div>
                 <div className="relative">
                   <button
