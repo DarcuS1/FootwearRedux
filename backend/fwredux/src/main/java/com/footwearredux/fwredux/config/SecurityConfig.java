@@ -32,7 +32,7 @@ public class SecurityConfig{
                         .disable()
                 )
                 .authorizeHttpRequests( authorize -> authorize
-                        .requestMatchers("/api/v1/auth/**", "/api/v1/shoes/fetch", "/api/v1/shoe_images/fetch/**")
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/shoes/fetch", "/api/v1/shoe_images/fetch/**", "/api/v1/user/image/**")
                         .permitAll()
                         .requestMatchers("/api/v1/admin/**")
                         .hasAuthority(UserRole.ADMIN.name())
